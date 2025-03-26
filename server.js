@@ -44,6 +44,12 @@ client.on("message", (channel, tags, message, self) => {
   if (message.includes("who am i")) {
     client.say(channel, `your name is ${tags["display-name"]}`);
   }
+    if (message.includes("!ban ProKameron")) {
+    client.say(channel, `oh SCREW YOU ${tags["display-name"]}`);
+  }
+      if (message.includes("!ban @ProKameron")) {
+    client.say(channel, `oh SCREW YOU ${tags["display-name"]}`);
+  }
 });
 
 // Connect to Twitch chat
