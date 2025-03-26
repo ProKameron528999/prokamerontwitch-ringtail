@@ -29,7 +29,7 @@ client.on('message', (channel, tags, message, self) => {
     console.log(`[${tags['display-name']}]: ${message}`);
     
     // Respond if the message contains "hello"
-    if (message.includes('Epic moenys have been distributed. Time to gamble! LETSGO')) {
+    if (message.includes('Epic moenys have been distributed. Time to gamble! LETSGO') || message.includes("@ringtail216 received")) {
         client.say(channel, '!takepoints');
     }
 });
