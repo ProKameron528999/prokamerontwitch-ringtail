@@ -1,9 +1,9 @@
-//process.exit()
+process.exit()
 
 const tmi = require('tmi.js');
 
 // Twitch credentials
-const username = 'your_twitch_username';
+const username = 'prokameron';
 const oauthToken = process.env.ACCESS_TOKEN; // Get from https://twitchapps.com/tmi/
 
 // Twitch channel to connect to
