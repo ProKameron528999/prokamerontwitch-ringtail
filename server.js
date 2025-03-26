@@ -1,4 +1,4 @@
-//process.exit()
+process.exit()
 
 const tmi = require("tmi.js");
 
