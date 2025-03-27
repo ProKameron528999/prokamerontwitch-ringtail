@@ -1,5 +1,6 @@
-process.exit()
-
+//process.exit()
+const ran = require("./lib/random");
+console.log(ran.choose["oh"])
 const tmi = require("tmi.js");
 
 // Twitch credentials
@@ -45,10 +46,10 @@ client.on("message", (channel, tags, message, self) => {
     client.say(channel, `your name is ${tags["display-name"]}`);
   }
     if (message.includes("!ban ProKameron")) {
-    client.say(channel, `oh SCREW YOU ${tags["display-name"]}`);
+    client.say(channel, ran.chooseAngryResponse() + tags["display-name"]);
   }
       if (message.includes("!ban @ProKameron")) {
-    client.say(channel, `oh SCREW YOU ${tags["display-name"]}`);
+    client.say(channel, ran.chooseAngryResponse() + tags["display-name"]);
   }
 });
 
