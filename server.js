@@ -1,4 +1,4 @@
-process.exit()
+process.exit();
 const ran = require("./lib/random");
 const tmi = require("tmi.js");
 
@@ -22,8 +22,7 @@ const client = new tmi.Client({
   },
   channels: [channelName],
 });
-console.log(ran.chooseAngryResponse() + "user") 
-
+console.log(ran.chooseAngryResponse() + "user");
 
 // Event listener for incoming chat messages
 client.on("message", (channel, tags, message, self) => {
@@ -46,10 +45,10 @@ client.on("message", (channel, tags, message, self) => {
   if (message.includes("who am i")) {
     client.say(channel, `your name is ${tags["display-name"]}`);
   }
-    if (message.includes("!ban ProKameron")) {
-    client.say(channel, ran.chooseAngryResponse() + tags["display-name"]);
-  }
-      if (message.includes("!ban @ProKameron")) {
+  if (
+    message.includes("!ban ProKameron") ||
+    message.includes("!ban @ProKameron")
+  ) {
     client.say(channel, ran.chooseAngryResponse() + tags["display-name"]);
   }
 });
