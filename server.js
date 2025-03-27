@@ -1,6 +1,5 @@
 //process.exit()
 const ran = require("./lib/random");
-console.log(ran.choose["oh"])
 const tmi = require("tmi.js");
 
 // Twitch credentials
@@ -23,6 +22,8 @@ const client = new tmi.Client({
   },
   channels: [channelName],
 });
+console.log(ran.chooseAngryResponse() + "user") 
+
 
 // Event listener for incoming chat messages
 client.on("message", (channel, tags, message, self) => {
