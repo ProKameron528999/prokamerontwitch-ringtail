@@ -1,4 +1,4 @@
-//process.exit()
+process.exit()
 const ran = require("./lib/random");
 const tmi = require("tmi.js");
 
