@@ -97,4 +97,4 @@
     "I take it that you're... not good at spending money, ",
     "Please tell me you meant to use that command on someone else, ",
     "They should put you in detention for 99 seconds, ",
-    "This is the 100th line, and it was written JUST IN FUCKING TIME. SCREW YOU, "
+    "This is the 100th line, and it was written JUST IN FUCKING TIME. SCREW YOU, ",
