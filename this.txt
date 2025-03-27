@@ -10,6 +10,7 @@
     "did I do something wrong? @",
     "whatever I said, it was a joke, ",
     "whyyyyyyyy 😭 ",
+    "Today is not your day. This is line number 13. The unlucky number. Tomorrow isn't looking good either, "
     "insert tearful message here ",
     "insert message questioning why you did this here ",
     "😭😭😭 ",
@@ -56,8 +57,8 @@
     "There should be a real life law against this, ",
     "If the person I'm thinking of does a !ban on me within the next minute, they have to pay me $10. I'm thinking of... @",
     "Nobody will remember you when you inevitably die in real life, ",
-    "you do realize, even if you use !ban on me, I'll still be back in 10 minutes, ",
     "A-60 is coming to your house because this is actually the 60th line I've written, "
+    "you do realize, even if you use !ban on me, I'll still be back in 10 minutes, ",
     "I don't recall a time I've ever done this to you, so why do this to me, ",
     "the more I write these lines, the rarer this message becomes, and the more hateful I get toward you, ",
     "If you woulda simply GIVEN me those 10000 channel points you used to !ban me, I coulda shut up for way longer than 10 minutes. It's a good trade deal. You do realize that right, ",
@@ -65,6 +66,12 @@
     "oh you think you're so funny huh, ",
     "this is why nobody likes you, ",
     "just know I will NEVER forgive you for this, ",
+    "YOU ARE LUCKY! This is line number 69, and there are 100 possible lines! CONGRATULATIONS!!!! @"
     "10 minutes is nothing, I’ll be back before you know it, ",
     "you must be really bored if this is what you do for fun, ",
     "at least I'm not the one WASTING channel points, ",
+    "this doesn't give you any ACTUAL power, ",
+    "You know, if you continue wasting points like this, you'll never have enough for $100, ",
+    "oh wow, you banned me. do you want a medal or something? ",
+    "If you’re this petty over Twitch chat messages, I fear for your real life, ",
+    "What would you do if you had my real life home address? No, that's a serious question. Ignore the fact this is an API call. what would you do with it @",
