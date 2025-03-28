@@ -27,7 +27,7 @@ console.log(ran.chooseAngryResponse() + "user");
 // Event listener for incoming chat messages
 client.on("message", (channel, tags, message, self) => {
   if (self) return; // Ignore messages from the bot itself
-  console.log(`[${tags["display-name"]}]: ${message}`);
+ // console.log(`[${tags["display-name"]}]: ${message}`);
   // console.log(tags['display-name'])
   // Respond if the message contains "hello"
   if (
@@ -36,7 +36,7 @@ client.on("message", (channel, tags, message, self) => {
     ) ||
     message.includes("@ringtail216 received")
   ) {
-    if (tags["display-name"] !== "ringbot216") {
+    if (tags["display-name"] == "ringbot216") {
       client.say(channel, "!takepoints");
     } else {
       client.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
