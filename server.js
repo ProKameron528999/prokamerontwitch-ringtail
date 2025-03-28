@@ -42,8 +42,11 @@ client.on("message", (channel, tags, message, self) => {
       client.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
     }
   }
-  if (message.includes("who am i")) {
+  if (message.toLowerCase().includes("who am i")) {
     client.say(channel, `your name is ${tags["display-name"]}`);
+  }
+    if (message.toLowerCase().includes("flip a coin")) {
+    client.say(channel, `${tags["display-name"]}, it's ${ran.choose(["Heads","Tails"])}!`);
   }
   if (
     message.includes("!ban ProKameron") ||
