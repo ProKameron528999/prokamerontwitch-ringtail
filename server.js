@@ -47,7 +47,7 @@ client.on("message", (channel, tags, message, self) => {
   }
     if (message.toLowerCase().includes("flip a coin")) {
     client.say(channel, `${tags["display-name"]}, it's ${ran.choose(["Heads","Tails"])}!`);
-  }
+  } 
   if (
     message.includes("!ban ProKameron") ||
     message.includes("!ban @ProKameron")
