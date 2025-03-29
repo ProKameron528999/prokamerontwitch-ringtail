@@ -22,8 +22,8 @@ const client = new tmi.Client({
   },
   channels: [channelName],
 });
-console.log(ran.chooseAngryResponse() + "user");
-
+let thething = ran.chooseAngryResponse() 
+console.log('[AUTO-RESPONSE] ' + thething + "user" + " (response #" + thething.index + ")");
 // Event listener for incoming chat messages
 client.on("message", (channel, tags, message, self) => {
   if (self) return; // Ignore messages from the bot itself
@@ -52,7 +52,8 @@ client.on("message", (channel, tags, message, self) => {
     message.toLowerCase().includes("!ban prokameron") ||
     message.toLowerCase().includes("!ban @prokameron")
   ) {
-    client.say(channel, '[AUTO-RESPONSE] ' + ran.chooseAngryResponse() + tags["display-name"]);
+    let response = ran.chooseAngryResponse()
+    client.say(channel, '[AUTO-RESPONSE] ' + response + tags["display-name"] + " (response #" + response.index + ")");
   }
 });
 
