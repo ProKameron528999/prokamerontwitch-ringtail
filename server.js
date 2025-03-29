@@ -49,10 +49,10 @@ client.on("message", (channel, tags, message, self) => {
     client.say(channel, `${tags["display-name"]}, it's ${ran.choose(["Heads","Tails"])}!`);
   } 
   if (
-    message.includes("!ban ProKameron") ||
-    message.includes("!ban @ProKameron")
+    message.toLowerCase().includes("!ban prokameron") ||
+    message.toLowerCase().includes("!ban @prokameron")
   ) {
-    client.say(channel, ran.chooseAngryResponse() + tags["display-name"]);
+    client.say(channel, '[AUTO-RESPONSE] ' + ran.chooseAngryResponse() + tags["display-name"]);
   }
 });
 
