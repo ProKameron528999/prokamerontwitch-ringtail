@@ -62,7 +62,11 @@ client.on("message", (channel, tags, message, self) => {
     }
   }
   if (message.toLowerCase().includes("who am i")) {
-    client.say(channel, `your name is ${tags["display-name"]}`);
+    let status = "Regular chatter"
+    if(tags["mod"]){status = "Moderator"} 
+    if(tags["vip"]){status = "VIP"}
+    if(tags["user-type"] == "broadcaster") {status = "Broadcaster"}
+    client.say(channel, `You are ${tags["display-name"]}, you are a ${status} with the color ${tags["color"]}. Your user ID is ${tags["user-id"]}`);
   }
     if (message.toLowerCase().includes("flip a coin")) {
     client.say(channel, `${tags["display-name"]}, it's ${ran.choose(["Heads","Tails"])}!`);
