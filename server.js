@@ -26,13 +26,13 @@ let thething = ran.chooseAngryResponse()
 console.log('[AUTO-RESPONSE] ' + thething + "user" + " (response #" + thething.index + ")");
 // Event listener for incoming chat messages
 let timeouts = {}
-client.on('timeout', (channel, username, reason, tags) => {
-  client.say(channel, `[API] User ${username} has been timed out in ${channel} for reason: ${reason || 'No reason provided'}`);
+client.on('timeout', (channel, username, reason, duration, tags) => {
+  client.say(channel, `[API] User ${username} has been timed out in ${channel} for ${duration} seconds for reason: ${reason || 'No reason provided'}`);
       timeouts[username] = Date.now() + duration * 1000;
 
     // Schedule a function to trigger when timeout expires
     setTimeout(() => {
-        console.log(`${username}'s timeout has expired.`);
+        client.say(channel, `[Timeout tracker] ${username}'s timeout has expired.`);
         delete timeouts[username]; // Remove from tracking
     }, duration * 1000);
 });
@@ -79,3 +79,11 @@ client.on("message", (channel, tags, message, self) => {
 
 // Connect to Twitch chat
 client.connect().catch(console.error);
+
+
+process.on("unhandledRejection", (reason, p) => {
+  console.error(reason, p);
+});
+process.on("uncaughtException", (err, origin) => {
+  console.error(err, origin);
+});
