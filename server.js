@@ -53,7 +53,8 @@ client.on("message", (channel, tags, message, self) => {
     message.toLowerCase().includes("!ban @prokameron")
   ) {
     let response = ran.chooseAngryResponse()
-    client.say(channel, '[AUTO-RESPONSE] ' + response + tags["display-name"] + " (response #" + response.index + ")");
+   client.say(channel, '[AUTO-RESPONSE] ' + response + tags["display-name"] + " (response #" + response.index + ")");
+    //client.say(channel, "!roulette 100")
   }
 });
 
