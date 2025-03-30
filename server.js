@@ -7,7 +7,7 @@ const username = "prokameron";
 const oauthToken = process.env.ACCESS_TOKEN; // Get from https://twitchapps.com/tmi/
 
 // Twitch channel to connect to
-const channelName = "ringtail216";
+const channelName = "joeysrandom";
 
 // Configure the Twitch client
 const client = new tmi.Client({
@@ -22,8 +22,6 @@ const client = new tmi.Client({
   },
   channels: [channelName],
 });
-let thething = ran.chooseAngryResponse() 
-console.log('[AUTO-RESPONSE] ' + thething + "user" + " (response #" + thething.index + ")");
 // Event listener for incoming chat messages
 let timeouts = {}
 client.on('timeout', (channel, username, reason, duration, tags) => {
@@ -49,18 +47,6 @@ client.on("message", (channel, tags, message, self) => {
  // console.log(`[${tags["display-name"]}]: ${message}`);
   // console.log(tags['display-name'])
   // Respond if the message contains "hello"
-  if (
-    message.includes(
-      "Epic moenys have been distributed. Time to gamble! LETSGO"
-    ) ||
-    message.includes("@ringtail216 received")
-  ) {
-    if (tags["display-name"] == "ringbot216") {
-      client.say(channel, "!takepoints");
-    } else {
-      client.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
-    }
-  }
   if (message.toLowerCase().includes("who am i")) {
     let status = "Regular chatter"
     if(tags["mod"]){status = "Moderator"} 
@@ -71,15 +57,11 @@ client.on("message", (channel, tags, message, self) => {
     if (message.toLowerCase().includes("flip a coin")) {
     client.say(channel, `${tags["display-name"]}, it's ${ran.choose(["Heads","Tails"])}!`);
   } 
-  if (
-    message.toLowerCase().includes("!ban prokameron") ||
-    message.toLowerCase().includes("!ban @prokameron")
-  ) {
-    let response = ran.chooseAngryResponse()
-   client.say(channel, '[AUTO-RESPONSE] ' + response + tags["display-name"] + " (response #" + response.index + ")");
-    //client.say(channel, "!roulette 100")
-  }
 });
+
+client.on('mod', (channel, username) => {client.say(channel, `[API] ${username} is now a moderator.`) });
+client.on('unmod', (channel, username) => {client.say(channel, `[API] ${username} is no longer a moderator.`) });
+
 
 // Connect to Twitch chat
 client.connect().catch(console.error);
