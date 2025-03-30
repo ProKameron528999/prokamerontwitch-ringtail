@@ -25,9 +25,18 @@ const client = new tmi.Client({
 let thething = ran.chooseAngryResponse() 
 console.log('[AUTO-RESPONSE] ' + thething + "user" + " (response #" + thething.index + ")");
 // Event listener for incoming chat messages
+let timeouts = {}
 client.on('timeout', (channel, username, reason, tags) => {
   client.say(channel, `[API] User ${username} has been timed out in ${channel} for reason: ${reason || 'No reason provided'}`);
+      timeouts[username] = Date.now() + duration * 1000;
+
+    // Schedule a function to trigger when timeout expires
+    setTimeout(() => {
+        console.log(`${username}'s timeout has expired.`);
+        delete timeouts[username]; // Remove from tracking
+    }, duration * 1000);
 });
+
 client.on('ban', (channel, user, reason, bot) => {
     client.say(channel, `[API] User ${user} banned from ${channel} for ${reason}`);
     // Add your logic here to log, alert, or process the ban event
