@@ -81,6 +81,9 @@ client.on("message", (channel, tags, message, self) => {
   }
 });
 
+client.on('mod', (channel, username) => {client.say(channel, `[API] ${username} was promoted to moderator.`) });
+client.on('unmod', (channel, username) => {client.say(channel, `[API] ${username} was demoted from moderator.`) });
+
 // Connect to Twitch chat
 client.connect().catch(console.error);
 
