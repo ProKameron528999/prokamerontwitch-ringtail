@@ -129,7 +129,7 @@ try {
             if (racialslur.some((word) => translated.includes(word))) {
                 translated = "[Message Censored. They said a SLUR!]";
             }
-            client.say(channel, `[AUTO-TRANSLATE] ${tags["display-name"]} said: "${translated}"`);
+            client.say(channel, `[AUTO-TRANSLATE] From ${detectedLang.lang}, ${tags["display-name"]} said: "${translated}"`);
         }
     }
 } catch (error) {
