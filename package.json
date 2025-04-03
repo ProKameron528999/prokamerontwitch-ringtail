@@ -14,7 +14,8 @@
     "@fastify/view": "^8.0.0",
     "tmi.js": "^1.8.5",
     "translate-google": "^1.5.0",
-    "langdetect": "^0.2.1"
+    "langdetect": "^0.2.1",
+    "langs": "^2.0.0"
   },
   "engines": {
     "node": "14.x"

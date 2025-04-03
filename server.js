@@ -1,6 +1,7 @@
 //process.exit();
 
 const { detect } = require("langdetect");
+const langs = require("langs");
 
 var racialslur = [
   "nick/her",
@@ -119,9 +120,22 @@ client.on("message", async (channel, tags, message, self) => {
 
   // Auto-translate messages that aren't in English
 try {
-    const detectedLang = detect(message);
+    const detected = detect(message);
+    const detectedLangCode = detected[0]?.lang || "unknown"; // Extract language code safely
+  console.log(detectedLangCode)
 
-    if (detectedLang !== "en") { // Only translate if not English
+    // Convert the language code to a full language name
+    const langData = langs.where("1", detectedLangCode);
+    let detectedLangName = langData ? langData.name : "Unknown";
+  if (detectedLangName == "Unknown") {
+    switch(detectedLangCode) {
+      case "zh-cn": detectedLangName = "Chinese (Simplified)"; break;
+      case "zh-tw": detectedLangName = "Chinese (Traditional)"; break;
+
+    }
+  }
+
+    if (detectedLangCode !== "en") { // Only translate if not English
         let translated = await translate(message, { to: "en" });
 
         // If the message changes after translation, it means it's not in English
@@ -129,7 +143,7 @@ try {
             if (racialslur.some((word) => translated.includes(word))) {
                 translated = "[Message Censored. They said a SLUR!]";
             }
-            client.say(channel, `[AUTO-TRANSLATE] From ${detectedLang.lang}, ${tags["display-name"]} said: "${translated}"`);
+            client.say(channel, `[AUTO-TRANSLATE] From ${detectedLangName}, ${tags["display-name"]} said: "${translated}"`);
         }
     }
 } catch (error) {
