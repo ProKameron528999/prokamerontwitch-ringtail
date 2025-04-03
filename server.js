@@ -1,5 +1,6 @@
 //process.exit();
 
+const { detect } = require("langdetect");
 
 var racialslur = [
   "nick/her",
@@ -117,17 +118,23 @@ client.on("message", async (channel, tags, message, self) => {
   if (self) return; // Ignore messages from the bot itself
 
   // Auto-translate messages that aren't in English
-  try {
-    let translated = await translate(message, { to: "en" });
+try {
+    const detectedLang = detect(message);
 
-    // If the message changes after translation, it means it's not in English
-    if (translated.toLowerCase() !== message.toLowerCase()) {
-      if(racialslur.some((word) => msg.includes(word))) {}
-   //   client.say(channel, `[AUTO-TRANSLATE] ${tags["display-name"]} said: "${translated}"`);
+    if (detectedLang !== "en") { // Only translate if not English
+        let translated = await translate(message, { to: "en" });
+
+        // If the message changes after translation, it means it's not in English
+        if (translated.toLowerCase() !== message.toLowerCase()) {
+            if (racialslur.some((word) => translated.includes(word))) {
+                translated = "[Message Censored. They said a SLUR!]";
+            }
+            client.say(channel, `[AUTO-TRANSLATE] ${tags["display-name"]} said: "${translated}"`);
+        }
     }
-  } catch (error) {
+} catch (error) {
     console.error("Translation error:", error);
-  }
+}
 
   // Custom bot responses
   if (
