@@ -169,7 +169,7 @@ client.on("clearchat", (channel) => {
 let timeouts = {};
 
 client.on("timeout", (channel, username, reason, duration, tags) => {
-  client.say(channel, `[API] User ${username} has been timed out in ${channel} for ${duration} seconds for reason: ${reason || "No reason provided"}`);
+  client.say(channel, `User ${username} has been timed out in ${channel} for ${duration} seconds for reason: ${reason || "No reason provided"}`);
   timeouts[username] = Date.now() + duration * 1000;
 
   setTimeout(() => {
@@ -179,11 +179,11 @@ client.on("timeout", (channel, username, reason, duration, tags) => {
 });
 
 client.on("ban", (channel, user, reason, bot) => {
-  client.say(channel, `[API] User ${user} banned from ${channel} for ${reason}`);
+  client.say(channel, `User ${user} banned from ${channel} for ${reason}`);
 });
 
 client.on("raided", (channel, username, viewers) => {
-  client.say(channel, `[API] Welcome in, all ${viewers} raiders from ${username}!`);
+  client.say(channel, `Welcome in, all ${viewers} raiders from ${username}!`);
 });
 
 client.on("message", async (channel, tags, message, self) => {
@@ -239,6 +239,9 @@ try {
       userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
     }
   }
+              if (racialslur.some((word) => message.includes(word))) {
+                client.say(channel, `${tags["display-name"]}, Slurs are not allowed!`)
+            }
 
   if (message.toLowerCase().includes("pk!whoami") && tags["display-name"] !== "jumbojosh2ndbiggestfan") {
     let status = "Regular chatter";
