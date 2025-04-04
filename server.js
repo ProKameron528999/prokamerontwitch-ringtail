@@ -85,8 +85,30 @@ const oauthToken = process.env.ACCESS_TOKEN; // Get from https://twitchapps.com/
 const channelName = "ringtail216";
 
 // Configure the Twitch client
+const silentLogger = {
+  info: () => {},
+  warn: () => {},
+  error: () => {},
+};
+
+const userclient = new tmi.Client({
+  options: {
+    debug: false, // optional
+    logger: silentLogger, // suppresses logs
+  },
+  identity: {
+    username: "ProKameron",
+    password: process.env.ACCESS_TOKEN_OLD,
+  },
+  connection: {
+    secure: true,
+    reconnect: true,
+  },
+  channels: [channelName],
+});
+
 const client = new tmi.Client({
-  options: { debug: true },
+  options: { debug: false },
   identity: {
     username: username,
     password: oauthToken,
@@ -98,18 +120,27 @@ const client = new tmi.Client({
   channels: [channelName],
 });
 
-const userclient = new tmi.Client({
-  options: { debug: true },
-  identity: {
-    username: "ProKameron",
-    password: process.env.ACCESS_TOKEN_OLD,
-  },
-  connection: {
-    secure: true,
-    reconnect: true,
-  },
-  channels: [channelName],
+
+function log(message) {
+  const now = new Date().toLocaleTimeString("en-US", { hour12: false });
+  console.log(`[${now}] info: ${message}`);
+}
+
+
+client.on('connecting', () => log('Connecting to irc-ws.chat.twitch.tv on port 443..'));
+client.on('connected', (address, port) => {
+  log('Connected to server.');
+  log(`Executing command: JOIN #${channelName}`);
 });
+client.on('join', (channel, username_, self) => {
+  if (self) log(`Joined ${channel}`);
+});
+client.on('message', (channel, tags, message, self) => {
+  if (!self) {
+    log(`[${channel}] <${tags['display-name'] || tags.username}>: ${message}`);
+  }
+});
+
 
 let timeouts = {};
 
