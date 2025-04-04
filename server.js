@@ -130,7 +130,26 @@ function log(message) {
 client.on('connecting', () => log('Connecting to irc-ws.chat.twitch.tv on port 443..'));
 client.on('connected', (address, port) => {
   log('Connected to server.');
-  log(`Executing command: JOIN #${channelName}`);
+  log("Joining #ringtail216")
+});
+
+client.on('logon', (address, port) => {
+  log('Sending authentication to server..');
+});
+
+client.on("reconnect", () => {
+    log("Reconnecting...")
+});
+
+client.on("serverchange", (channel) => {
+    log("The server has changed.")
+});
+
+client.on('disconnected', (address, port) => {
+  log('Disconnected from server.');
+});
+client.on('part', (channel, username_, self) => {
+  if (self) log(`Left ${channel}`);
 });
 client.on('join', (channel, username_, self) => {
   if (self) log(`Joined ${channel}`);
@@ -139,6 +158,10 @@ client.on('message', (channel, tags, message, self) => {
   if (!self) {
     log(`[${channel}] <${tags['display-name'] || tags.username}>: ${message}`);
   }
+});
+
+client.on("clearchat", (channel) => {
+    client.say("The chat was cleared. Hi everyone!")
 });
 
 
@@ -216,7 +239,7 @@ try {
     }
   }
 
-  if (message.toLowerCase().includes("who am i") && tags["display-name"] !== "jumbojosh2ndbiggestfan") {
+  if (message.toLowerCase().includes("pk!whoami") && tags["display-name"] !== "jumbojosh2ndbiggestfan") {
     let status = "Regular chatter";
     if (tags["mod"]) status = "Moderator";
     if (tags["vip"]) status = "VIP";
@@ -225,7 +248,7 @@ try {
     client.say(channel, `You are ${tags["display-name"]}, a ${status} with the color ${tags["color"]}. Your user ID is ${tags["user-id"]}`);
   }
 
-  if (message.toLowerCase().includes("flip a coin") && tags["display-name"] !== "jumbojosh2ndbiggestfan") {
+  if (message.toLowerCase().includes("pk!coinflip") && tags["display-name"] !== "jumbojosh2ndbiggestfan") {
     client.say(channel, `${tags["display-name"]}, it's ${ran.choose(["Heads", "Tails"])}!`);
   }
 
