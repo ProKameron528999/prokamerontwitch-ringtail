@@ -125,20 +125,26 @@ client.on("message", async (channel, tags, message, self) => {
 try {
     const detected = detect(message);
     const detectedLangCode = detected[0]?.lang || "unknown"; // Extract language code safely
-  console.log(detectedLangCode)
+    console.log(detectedLangCode);
 
     // Convert the language code to a full language name
     const langData = langs.where("1", detectedLangCode);
     let detectedLangName = langData ? langData.name : "Unknown";
-  if (detectedLangName == "Unknown") {
-    switch(detectedLangCode) {
-      case "zh-cn": detectedLangName = "Chinese (Simplified)"; break;
-      case "zh-tw": detectedLangName = "Chinese (Traditional)"; break;
 
+    if (detectedLangName === "Unknown") {
+        switch (detectedLangCode) {
+            case "zh-cn": detectedLangName = "Chinese (Simplified)"; break;
+            case "zh-tw": detectedLangName = "Chinese (Traditional)"; break;
+        }
     }
-  }
 
-    if (detectedLangCode !== "en") { // Only translate if not English
+    const noTranslateWords = ["!modroulette", "!sr"]; // Add words you don't want translated
+
+    const containsNoTranslateWord = noTranslateWords.some(word =>
+        message.toLowerCase().includes(word.toLowerCase())
+    );
+
+    if (detectedLangCode !== "en" && !containsNoTranslateWord) {
         let translated = await translate(message, { to: "en" });
 
         // If the message changes after translation, it means it's not in English
@@ -152,6 +158,7 @@ try {
 } catch (error) {
     console.error("Translation error:", error);
 }
+
 
   // Custom bot responses
   if (
