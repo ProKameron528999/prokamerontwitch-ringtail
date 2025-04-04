@@ -78,7 +78,7 @@ const tmi = require("tmi.js");
 const translate = require("translate-google");
 
 // Twitch credentials
-const username = "prokameron";
+const username = "prokameronbot";
 const oauthToken = process.env.ACCESS_TOKEN; // Get from https://twitchapps.com/tmi/
 
 // Twitch channel to connect to
@@ -90,6 +90,19 @@ const client = new tmi.Client({
   identity: {
     username: username,
     password: oauthToken,
+  },
+  connection: {
+    secure: true,
+    reconnect: true,
+  },
+  channels: [channelName],
+});
+
+const userclient = new tmi.Client({
+  options: { debug: true },
+  identity: {
+    username: "ProKameron",
+    password: process.env.ACCESS_TOKEN_OLD,
   },
   connection: {
     secure: true,
@@ -166,9 +179,9 @@ try {
     message.includes("@ringtail216 received")
   ) {
     if (tags["display-name"] === "ringbot216") {
-      client.say(channel, "!takepoints");
+      userclient.say(channel, "!takepoints");
     } else {
-      client.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
+      userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
     }
   }
 
@@ -190,12 +203,14 @@ try {
     message.toLowerCase().includes("!ban @prokameron")
   ) {
     let response = ran.chooseAngryResponse();
-    client.say(channel, `[AUTO-RESPONSE] ${response} ${tags["display-name"]} (response #${response.index})`);
+    userclient.say(channel, `[AUTO-RESPONSE] ${response} ${tags["display-name"]} (response #${response.index})`);
   }
 });
 
 // Connect to Twitch chat
 client.connect().catch(console.error);
+userclient.connect().catch(console.error);
+
 
 process.on("unhandledRejection", (reason, p) => {
   console.error(reason, p);
