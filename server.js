@@ -4,6 +4,7 @@ const { detect } = require("langdetect");
 const langs = require("langs");
 
 var racialslur = [
+"cracker",
 "coon",
   "retard",
   "nick/her",
