@@ -219,7 +219,7 @@ try {
         // If the message changes after translation, it means it's not in English
         if (translated.toLowerCase() !== message.toLowerCase()) {
             if (racialslur.some((word) => translated.includes(word))) {
-                translated = "[Message Censored. They said a SLUR!]";
+                translated = "[Message Censored. They said a SLUR! @ringtail216, please take action.]";
             }
             client.say(channel, `[AUTO-TRANSLATE] From ${detectedLangName}, ${tags["display-name"]} said: "${translated}"`);
         }
