@@ -30,7 +30,6 @@ function normalizeText(str) {
 }
 
 var racialslur = [
-"cracker",
 "coon",
   "retard",
   "nick/her",
@@ -42,6 +41,10 @@ var racialslur = [
   "nick gur",
   "Nісk gur",
   "nickgur",
+    "niiigg",
+  "niiiigg",
+  "niiiiigg",
+  "niiiiii",
   "niger",
   "niga",
   "Nigg",
