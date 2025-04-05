@@ -285,6 +285,40 @@ try {
     console.error("Translation error:", error);
 }
 
+  
+  
+if (message.startsWith("!translate ")) {
+    try {
+        const msgToTranslate = message.replace("!translate ", "").trim();
+
+        const detected = detect(msgToTranslate);
+        const detectedLangCode = detected[0]?.lang || "unknown";
+        const langData = langs.where("1", detectedLangCode);
+        let detectedLangName = langData ? langData.name : "Unknown";
+
+        if (detectedLangName === "Unknown") {
+            switch (detectedLangCode) {
+                case "zh-cn": detectedLangName = "Chinese (Simplified)"; break;
+                case "zh-tw": detectedLangName = "Chinese (Traditional)"; break;
+            }
+        }
+
+        let translated = await translate(msgToTranslate, { to: "en" });
+
+        const containsSlur = racialslur.some((word) => normalizeText(translated).includes(word)) ||
+                              lessStrictSlurs.some((word) => lessnormalizeText(translated).includes(word));
+
+        if (containsSlur) {
+            client.say(channel, `${tags["display-name"]} tried to translate a SLUR! @ringtail216`);
+        } else {
+            client.say(channel, `${tags["display-name"]}, From ${detectedLangName}, the text you provided says "${translated}"`);
+        }
+
+    } catch (error) {
+        console.error("!translate error:", error);
+        client.say(channel, "Something went wrong while translating.");
+    }
+}
 
   // Custom bot responses
   if (
