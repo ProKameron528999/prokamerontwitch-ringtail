@@ -74,6 +74,7 @@ var racialslur = [
   "Nigg",
   "n1gg",
   "n!gg",
+"this is not a slur",
   "njgg",
   "nígg",
   "niigg",
@@ -326,7 +327,7 @@ if (message.startsWith("!translate ")) {
     message.includes("@ringtail216 received")
   ) {
     if (tags["display-name"] === "ringbot216") {
-      userclient.say(channel, "!takepoints");
+   //   userclient.say(channel, "!takepoints");
     } else {
       userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
     }
