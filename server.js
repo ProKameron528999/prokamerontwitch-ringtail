@@ -3,6 +3,32 @@
 const { detect } = require("langdetect");
 const langs = require("langs");
 
+
+function normalizeText(str) {
+  // Define a mapping for numbers to letters
+  const numberToLetterMap = {
+    '0': 'o',  // You can add more mappings as needed
+    '1': 'i',
+    '2': 'z',
+    '3': 'e',
+    '4': 'a',
+    '5': 's',
+    '6': 'g',
+    '7': 't',
+    '8': 'b',
+    '9': 'g',
+  };
+
+  return str
+    .normalize('NFD')                      // Break down diacritics
+    .replace(/[\u0300-\u036f]/g, '')       // Remove diacritics
+    .replace(/[^a-zA-Z0-9]/g, "")          // Remove non-alphanumeric characters
+    .replace(/[^\x00-\x7F]/g, '')          // Strip non-ASCII (optional)
+    .replace(/[0-9]/g, (match) => numberToLetterMap[match] || match)  // Replace numbers with letters
+    .replace(/[jlj]/g, 'i')                // Replace 'j' and 'l' with 'i'
+    .toLowerCase();                        // Convert to lowercase
+}
+
 var racialslur = [
 "cracker",
 "coon",
@@ -207,7 +233,7 @@ try {
         }
     }
 
-    const noTranslateWords = ["!modroulette", "!sr"]; // Add words you don't want translated
+    const noTranslateWords = ["!modroulette", "!sr", "!daily","!setuptierlist"]; // Add words you don't want translated
 
     const containsNoTranslateWord = noTranslateWords.some(word =>
         message.toLowerCase().includes(word.toLowerCase())
@@ -218,7 +244,7 @@ try {
 
         // If the message changes after translation, it means it's not in English
         if (translated.toLowerCase() !== message.toLowerCase()) {
-            if (racialslur.some((word) => translated.includes(word))) {
+            if (racialslur.some((word) => normalizeText(translated).includes(word))) {
                 translated = "[Message Censored. They said a SLUR! @ringtail216, please take action.]";
             }
             client.say(channel, `[AUTO-TRANSLATE] From ${detectedLangName}, ${tags["display-name"]} said: "${translated}"`);
@@ -240,7 +266,7 @@ try {
       userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
     }
   }
-              if (racialslur.some((word) => message.includes(word))) {
+              if (racialslur.some((word) => normalizeText(message).includes(word))) {
                 client.say(channel, `${tags["display-name"]}, Slurs are not allowed!`)
             }
 
