@@ -29,8 +29,32 @@ function normalizeText(str) {
     .toLowerCase();                        // Convert to lowercase
 }
 
+function lessnormalizeText(str) {
+  // Define a mapping for numbers to letters
+  const numberToLetterMap = {
+    '0': 'o',  // You can add more mappings as needed
+    '1': 'i',
+    '2': 'z',
+    '3': 'e',
+    '4': 'a',
+    '5': 's',
+    '6': 'g',
+    '7': 't',
+    '8': 'b',
+    '9': 'g',
+  };
+
+  return str
+    .normalize('NFD')                      // Break down diacritics
+    .replace(/[\u0300-\u036f]/g, '')       // Remove diacritics
+  //  .replace(/[^a-zA-Z0-9]/g, "")          // Remove non-alphanumeric characters
+    .replace(/[^\x00-\x7F]/g, '')          // Strip non-ASCII (optional)
+    .replace(/[0-9]/g, (match) => numberToLetterMap[match] || match)  // Replace numbers with letters
+    .replace(/[jlj]/g, 'i')                // Replace 'j' and 'l' with 'i'
+    .toLowerCase();                        // Convert to lowercase
+}
+
 var racialslur = [
-"coon",
   "retard",
   "nick/her",
   "nickher",
@@ -94,12 +118,17 @@ var racialslur = [
   "Gin jockey",
   "Gubba",
   "Gwer",
-  "Fag",
   "Tranny",
   "⁥",
   "noobkameron",
   "noobkameron",
   "noob kameron",
+].map(function (v) {
+  return v.toLowerCase();
+});
+
+var lessStrictSlurs = [
+  "fag"
 ].map(function (v) {
   return v.toLowerCase();
 });
@@ -247,7 +276,7 @@ try {
 
         // If the message changes after translation, it means it's not in English
         if (translated.toLowerCase() !== message.toLowerCase()) {
-            if (racialslur.some((word) => normalizeText(translated).includes(word))) {
+            if (racialslur.some((word) => normalizeText(message).includes(word)) || lessStrictSlurs.some((word) => lessnormalizeText(message).includes(word))) {
                 client.say(channel, `${tags["display-name"]} said a slur in a different language. Please take action, @ringtail216`);
             }
         }
@@ -269,7 +298,7 @@ try {
     }
   }
               if (racialslur.some((word) => normalizeText(message).includes(word))) {
-          //      client.say(channel, `${tags["display-name"]}, Slurs are not allowed!`)
+                client.say(channel, `${tags["display-name"]}, Slurs are not allowed!`)
             }
 
   if (message.toLowerCase().includes("pk!whoami") && tags["display-name"] !== "jumbojosh2ndbiggestfan") {
