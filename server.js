@@ -269,7 +269,7 @@ try {
     }
   }
               if (racialslur.some((word) => normalizeText(message).includes(word))) {
-                client.say(channel, `${tags["display-name"]}, Slurs are not allowed!`)
+          //      client.say(channel, `${tags["display-name"]}, Slurs are not allowed!`)
             }
 
   if (message.toLowerCase().includes("pk!whoami") && tags["display-name"] !== "jumbojosh2ndbiggestfan") {
