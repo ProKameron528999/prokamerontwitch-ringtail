@@ -342,7 +342,7 @@ const money = match ? parseInt(match[1], 10) : null;
     if (tags["display-name"] === "ringbot216") {
 setTimeout(() => {
   userclient.say(channel, "!takepoints");
-}, 750);    } else {
+}, 1000);    } else {
       userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
     }
   }
