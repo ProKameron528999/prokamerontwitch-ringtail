@@ -320,6 +320,21 @@ if (message.startsWith("!translate ")) {
 }
 
   // Custom bot responses
+  if(tags["display-name"] === "ringbot216" || tags["display-name"] === "ProKameron") {
+    if(message.includes("@prokameronbot has")) {
+      const match = message.match(/has (\d+) Epice moenys/);
+
+const money = match ? parseInt(match[1], 10) : null;
+      client.say(channel, "!givepoints @prokameron " + money)
+    }
+    if(message.includes("pk!givememoney")) {
+      client.say(channel, "!points")
+    }
+    if(message.includes("pk!dodaily")) {
+      client.say(channel, "!daily")
+    }
+    
+  }
   if (
     message.includes("Epic moenys have been distributed. Time to gamble! LETSGO") ||
     message.includes("@ringtail216 received")
@@ -327,7 +342,7 @@ if (message.startsWith("!translate ")) {
     if (tags["display-name"] === "ringbot216") {
 setTimeout(() => {
   userclient.say(channel, "!takepoints");
-}, 1000);    } else {
+}, 750);    } else {
       userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
     }
   }
