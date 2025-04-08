@@ -343,9 +343,14 @@ const money = match ? parseInt(match[1], 10) : null;
     message.includes("Epice moenys to @ringtail216")
   ) {
     if (tags["display-name"] === "ringbot216") {
+      function getRandomNumber(min = 750, max = 3000) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
 setTimeout(() => {
   userclient.say(channel, "!takepoints");
-}, 1250);    } else {
+}, getRandomNumber());    } else {
   //    userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
     }
   }
