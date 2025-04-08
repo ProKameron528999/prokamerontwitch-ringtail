@@ -333,17 +333,20 @@ const money = match ? parseInt(match[1], 10) : null;
     if(message.includes("pk!dodaily")) {
       client.say(channel, "!daily")
     }
-    
+    if(message.includes("Epice moenys to @prokameron")) {
+      client.say(channel, "!points @prokameron")
+    }
   }
   if (
     message.includes("Epic moenys have been distributed. Time to gamble! LETSGO") ||
-    message.includes("@ringtail216 received")
+    message.includes("@ringtail216 received")|| 
+    message.includes("Epice moenys to @ringtail216")
   ) {
     if (tags["display-name"] === "ringbot216") {
 setTimeout(() => {
   userclient.say(channel, "!takepoints");
-}, 1000);    } else {
-      userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
+}, 1250);    } else {
+  //    userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
     }
   }
               if (racialslur.some((word) => normalizeText(message).includes(word))) {
