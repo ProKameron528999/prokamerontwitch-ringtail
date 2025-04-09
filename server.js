@@ -349,7 +349,7 @@ const money = match ? parseInt(match[1], 10) : null;
 
 
 setTimeout(() => {
-  //userclient.say(channel, "!takepoints");
+  userclient.say(channel, "!takepoints");
 }, getRandomNumber());    } else {
   //    userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
     }
