@@ -399,69 +399,38 @@ setTimeout(() => {
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-const path = require('path');
 
+let currentPoll = null;
 
 app.use(express.static('public'));
 
-const polls = {}; // Store polls by ID
-
-// Serve the embedded poll page
-app.get('/poll/:id', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'embed.html'));
-});
-
-// Twitch chat listener (e.g., with tmi.js)
 client.on('message', (channel, tags, message, self) => {
-  for (const id in polls) {
-    const poll = polls[id];
-    if (!poll.active) continue;
-    if (!message.startsWith('!vote ')) continue;
+  if (!currentPoll) return;
+  if (!message.startsWith('!vote ')) return;
 
-    const vote = message.split(' ')[1]?.toLowerCase();
-    if (!poll.options.includes(vote)) return;
+  const vote = message.split(' ')[1]?.toLowerCase();
+  if (!currentPoll.options.includes(vote)) return;
 
-    const voter = tags.username;
-    poll.votes[voter] = vote;
+  const voter = tags.username;
+  currentPoll.votes[voter] = vote;
 
-    io.to(id).emit('voteUpdate', poll.votes);
-  }
+  // Send update to frontend
+  io.emit('voteUpdate', currentPoll.votes);
 });
 
 io.on('connection', (socket) => {
-  socket.on('startPoll', ({ question, options }, callback) => {
-    const id = Date.now().toString();
-    const poll = {
-      id,
-      question,
-      options: options.map(o => o.toLowerCase()),
-      votes: {},
-      active: true
+  socket.on('startPoll', (poll) => {
+    currentPoll = {
+      question: poll.question,
+      options: poll.options.map(opt => opt.toLowerCase()),
+      votes: {}
     };
-
-    polls[id] = poll;
-    socket.join(id);
-
-    io.to(id).emit('pollStarted', poll);
-
-    // Return poll URL to the streamer
-    callback({ url: `/poll/${id}` });
+    io.emit('pollStarted', currentPoll);
   });
 
-  socket.on('endPoll', (id) => {
-    if (polls[id]) {
-      polls[id].active = false;
-      io.to(id).emit('pollEnded');
-    }
-  });
-
-  socket.on('joinPoll', (id) => {
-    if (polls[id]) {
-      socket.join(id);
-      socket.emit('pollStarted', polls[id]);
-      socket.emit('voteUpdate', polls[id].votes);
-    }
-    
+  socket.on('endPoll', () => {
+    io.emit('pollEnded', currentPoll);
+    currentPoll = null;
   });
 });
 

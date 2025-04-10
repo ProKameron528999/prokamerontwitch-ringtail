@@ -73,11 +73,11 @@
         return;
       }
 
-      socket.emit('startPoll', { question, options });
+      socket.emit('startPoll', { question, options });alert("Started")
     }
 
     function endPoll() {
-      socket.emit('endPoll');
+      socket.emit('endPoll');alert("Ended")
     }
   </script>
 </body>
