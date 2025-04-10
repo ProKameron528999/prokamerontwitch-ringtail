@@ -134,6 +134,14 @@ var lessStrictSlurs = [
 
 const ran = require("./lib/random");
 const tmi = require("tmi.js");
+const http = require('http');
+
+
+
+const { Server } = require('socket.io');
+
+const express = require('express');
+
 const translate = require("translate-google");
 
 // Twitch credentials
@@ -380,6 +388,54 @@ setTimeout(() => {
   }
 });
 
+
+
+
+
+
+
+
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+let currentPoll = null;
+
+app.use(express.static('public'));
+client.on('message', (channel, tags, message, self) => {
+  if (!currentPoll) return;
+  if (!message.startsWith('!vote ')) return;
+
+  const vote = message.split(' ')[1]?.toLowerCase();
+  if (!currentPoll.options.includes(vote)) return;
+
+  const voter = tags.username;
+  currentPoll.votes[voter] = vote;
+
+  // Send update to frontend
+  io.emit('voteUpdate', currentPoll.votes);
+});
+
+io.on('connection', (socket) => {
+  socket.on('startPoll', (poll) => {
+    currentPoll = {
+      question: poll.question,
+      options: poll.options.map(opt => opt.toLowerCase()),
+      votes: {}
+    };
+    io.emit('pollStarted', currentPoll);
+  });
+
+  socket.on('endPoll', () => {
+    io.emit('pollEnded', currentPoll);
+    currentPoll = null;
+  });
+});
+
+server.listen(3000, () => {
+  console.log('Server running on http://localhost:3000');
+});
 // Connect to Twitch chat
 client.connect().catch(console.error);
 userclient.connect().catch(console.error);

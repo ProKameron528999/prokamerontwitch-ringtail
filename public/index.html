@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Twitch Chat Poll</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1e1e2f;
+      color: #fff;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #61dafb;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 8px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      width: 300px;
+    }
+
+    input {
+      background-color: #2c2c3e;
+      color: white;
+    }
+
+    button {
+      background-color: #61dafb;
+      color: black;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #21a1f1;
+    }
+
+    .vote-result {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .vote-option {
+      margin-bottom: 15px;
+      background-color: #2c2c3e;
+      padding: 15px;
+      border-radius: 10px;
+      position: relative;
+    }
+
+    .vote-bar {
+      height: 10px;
+      background-color: #61dafb;
+      width: 0;
+      border-radius: 5px;
+      transition: width 0.3s ease;
+      position: absolute;
+      bottom: 10px;
+      left: 15px;
+      right: 15px;
+    }
+
+    .vote-label {
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .ended {
+      color: #ff8080;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Twitch Chat Poll</h1>
+  <input id="question" placeholder="Poll question"><br>
+  <input class="option" placeholder="Option 1"><br>
+  <input class="option" placeholder="Option 2"><br>
+  <input class="option" placeholder="Option 3"><br>
+  <button onclick="startPoll()">Start Poll</button>
+  <button onclick="endPoll()">End Poll</button>
+
+  <div class="vote-result" id="results"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    let currentOptions = [];
+
+    function startPoll() {
+      const question = document.getElementById('question').value;
+      const options = Array.from(document.getElementsByClassName('option'))
+        .map(input => input.value.trim())
+        .filter(Boolean);
+
+      if (!question || options.length < 2) {
+        alert('Enter a question and at least 2 options.');
+        return;
+      }
+
+      currentOptions = options;
+      socket.emit('startPoll', { question, options });
+    }
+
+    function endPoll() {
+      socket.emit('endPoll');
+    }
+
+    socket.on('pollStarted', (poll) => {
+      const results = document.getElementById('results');
+      results.innerHTML = `<h2>${poll.question}</h2>` + poll.options.map(opt => `
+        <div class="vote-option">
+          <div class="vote-label" id="label-${opt}">${opt}: <span id="count-${opt}">0</span> votes</div>
+          <div class="vote-bar" id="bar-${opt}"></div>
+        </div>
+      `).join('');
+    });
+
+    socket.on('voteUpdate', (votes) => {
+      const count = {};
+      Object.values(votes).forEach(vote => {
+        count[vote] = (count[vote] || 0) + 1;
+      });
+
+      let maxVotes = Math.max(...Object.values(count), 1);
+      currentOptions.forEach(opt => {
+        const voteCount = count[opt] || 0;
+        const countEl = document.getElementById(`count-${opt}`);
+        const barEl = document.getElementById(`bar-${opt}`);
+        if (countEl) countEl.innerText = voteCount;
+        if (barEl) barEl.style.width = `${(voteCount / maxVotes) * 100}%`;
+      });
+    });
+
+    socket.on('pollEnded', () => {
+      const results = document.getElementById('results');
+      results.innerHTML += '<div class="ended"><h3>📊 Poll Ended</h3></div>';
+    });
+  </script>
+</body>
+</html>
