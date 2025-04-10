@@ -104,48 +104,75 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
-    const pollContainer = document.getElementById('poll-container');
-    const questionEl = document.getElementById('question');
-    const optionsEl = document.getElementById('options');
-    const endedEl = document.getElementById('ended');
-    let currentOptions = [];
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  const pollContainer = document.getElementById('poll-container');
+  const questionEl = document.getElementById('question');
+  const optionsEl = document.getElementById('options');
+  const endedEl = document.getElementById('ended');
+  let currentOptions = [];
+  let latestVotes = {};
 
-    socket.on('pollStarted', (poll) => {
-      currentOptions = poll.options;
-      questionEl.textContent = poll.question;
-      optionsEl.innerHTML = poll.options.map((opt, index) => `
-        <li class="option" id="opt-${opt}">
-          <span class="number">${index + 1}</span>
-          <span class="text">${opt}</span>
-          <span class="percent" id="percent-${opt}">0%</span>
-          <div class="bar"><div class="bar-inner" id="bar-${opt}"></div></div>
-        </li>
-      `).join('');
-      pollContainer.style.display = 'block';
-      endedEl.style.display = 'none';
+  socket.on('pollStarted', (poll) => {
+    currentOptions = poll.options;
+    latestVotes = {};
+    questionEl.textContent = poll.question;
+    optionsEl.innerHTML = poll.options.map((opt, index) => `
+      <li class="option" id="opt-${opt}">
+        <span class="number">${index + 1}</span>
+        <span class="text">${opt}</span>
+        <span class="percent" id="percent-${opt}">0%</span>
+        <div class="bar"><div class="bar-inner" id="bar-${opt}"></div></div>
+      </li>
+    `).join('');
+    pollContainer.style.display = 'block';
+    endedEl.style.display = 'none';
+  });
+
+  socket.on('voteUpdate', (votes) => {
+    latestVotes = votes;
+    const count = {};
+    Object.values(votes).forEach(v => count[v] = (count[v] || 0) + 1);
+    const total = Object.values(count).reduce((a, b) => a + b, 0) || 1;
+
+    currentOptions.forEach(opt => {
+      const voteCount = count[opt] || 0;
+      const percent = ((voteCount / total) * 100).toFixed(1);
+
+      const percentEl = document.getElementById(`percent-${opt}`);
+      const barEl = document.getElementById(`bar-${opt}`);
+      if (percentEl) percentEl.textContent = `${percent}%`;
+      if (barEl) barEl.style.width = `${percent}%`;
+    });
+  });
+
+  socket.on('pollEnded', () => {
+    // Calculate final vote tally
+    const count = {};
+    Object.values(latestVotes).forEach(v => count[v] = (count[v] || 0) + 1);
+
+    // Find the option with the most votes
+    let maxVotes = 0;
+    let winner = null;
+    currentOptions.forEach(opt => {
+      if ((count[opt] || 0) > maxVotes) {
+        maxVotes = count[opt];
+        winner = opt;
+      }
     });
 
-    socket.on('voteUpdate', (votes) => {
-      const count = {};
-      Object.values(votes).forEach(v => count[v] = (count[v] || 0) + 1);
-      const total = Object.values(count).reduce((a, b) => a + b, 0) || 1;
+    // Highlight the winner's bar
+    if (winner) {
+      const winnerBar = document.getElementById(`bar-${winner}`);
+      if (winnerBar) {
+        winnerBar.style.background = '#FFD700';
+      }
+    }
 
-      currentOptions.forEach(opt => {
-        const voteCount = count[opt] || 0;
-        const percent = ((voteCount / total) * 100).toFixed(1);
-
-        const percentEl = document.getElementById(`percent-${opt}`);
-        const barEl = document.getElementById(`bar-${opt}`);
-        if (percentEl) percentEl.textContent = `${percent}%`;
-        if (barEl) barEl.style.width = `${percent}%`;
-      });
-    });
-
-    socket.on('pollEnded', () => {
-      endedEl.style.display = 'block';
-    });
-  </script>
+    // Optional: hide "poll ended" message
+    endedEl.style.display = 'none';
+  });
+</script>
 </body>
 </html>
