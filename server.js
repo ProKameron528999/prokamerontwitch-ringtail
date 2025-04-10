@@ -36,7 +36,7 @@ function sendWebhook(message) {
 function sendWebhookMessage(message) {
   const data = JSON.stringify({ content: message });
 
-  const url = new URL(process.env.WEBHOOK);
+  const url = new URL(process.env.WEBHOOK2);
   const options = {
     hostname: url.hostname,
     path: url.pathname + url.search,
@@ -281,8 +281,15 @@ client.on('join', (channel, username_, self) => {
   if (self) log(`Joined ${channel}`);
 });
 client.on('message', (channel, tags, message, self) => {
-  if (!self) {
+//  if (!self) {
     log(`[${channel}] <${tags['display-name'] || tags.username}>: ${message}`);
+    const containsSlur = racialslur.some((word) => normalizeText(message).includes(word)) ||
+                              lessStrictSlurs.some((word) => lessnormalizeText(message).includes(word));
+    if(containsSlur) {
+      sendWebhookMessage(`[${channel}] <${tags['display-name'] || tags.username}>: [SLUR CENSORED]`)
+    } else {
+      sendWebhookMessage(`[${channel}] <${tags['display-name'] || tags.username}>: ${message}`)
+//    }
   }
 });
 
