@@ -254,6 +254,7 @@ client.on("raided", (channel, username, viewers) => {
 
 client.on("message", async (channel, tags, message, self) => {
   if (self) return; // Ignore messages from the bot itself
+//  console.log(channel)
 
   // Auto-translate messages that aren't in English
 try {
@@ -436,10 +437,14 @@ io.on('connection', (socket) => {
       options: poll.options.map(opt => opt),
       votes: {}
     };
+    console.log(currentPoll.question)
+    console.log(currentPoll.options.join(', '))
+    client.say("#ringtail216", "The poll has started! " + currentPoll.question + " Vote in chat the number of the option. Options: " + currentPoll.options.join(', '))
     io.emit('pollStarted', currentPoll);
   });
 
   socket.on('endPoll', () => {
+    client.say("#ringtail216", "The poll has ended.")
     io.emit('pollEnded', currentPoll);
     currentPoll = null;
   });
