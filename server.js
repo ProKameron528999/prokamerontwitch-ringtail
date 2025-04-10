@@ -331,7 +331,7 @@ const money = match ? parseInt(match[1], 10) : null;
       client.say(channel, "!points")
     }
     if(message.includes("pk!dodaily")) {
-      client.say(channel, "!daily")
+      client.say(channel, "!movepoints")
     }
     if(message.includes("widgets to @prokameron")) {
       client.say(channel, "!points @prokameron")
