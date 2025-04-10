@@ -1,4 +1,6 @@
 //process.exit();
+const https = require('https');
+
 
 const { detect } = require("langdetect");
 const langs = require("langs");
@@ -15,7 +17,52 @@ function sendWebhook(message) {
       'Content-Length': data.length
     }
   };
+    const req = https.request(options, res => {
+    if (res.statusCode === 204) {
+      console.log('Message sent successfully.');
+    } else {
+      console.error(`Failed to send message. Status code: ${res.statusCode}`);
+    }
+  });
+
+  req.on('error', error => {
+    console.error('Error sending message:', error);
+  });
+
+  req.write(data);
+  req.end();
 }
+
+function sendWebhookMessage(message) {
+  const data = JSON.stringify({ content: message });
+
+  const url = new URL(process.env.WEBHOOK);
+  const options = {
+    hostname: url.hostname,
+    path: url.pathname + url.search,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': data.length
+    }
+  };
+    const req = https.request(options, res => {
+    if (res.statusCode === 204) {
+      console.log('Message sent successfully.');
+    } else {
+      console.error(`Failed to send message. Status code: ${res.statusCode}`);
+    }
+  });
+
+  req.on('error', error => {
+    console.error('Error sending message:', error);
+  });
+
+  req.write(data);
+  req.end();
+}
+
+
 function normalizeText(str) {
   // Define a mapping for numbers to letters
   const numberToLetterMap = {
@@ -247,26 +294,27 @@ client.on("clearchat", (channel) => {
 let timeouts = {};
 
 client.on("timeout", (channel, username, reason, duration, tags) => {
-  client.say(channel, `User ${username} has been timed out in ${channel} for ${duration} seconds for reason: ${reason || "No reason provided"}`);
+  sendWebhook(`User ${username} has been timed out in ${channel} for ${duration} seconds for reason: ${reason || "No reason provided"}`);
   timeouts[username] = Date.now() + duration * 1000;
 
   setTimeout(() => {
+    sendWebhook(`[Timeout tracker] ${username}'s timeout has expired.`)
     client.say(channel, `[Timeout tracker] ${username}'s timeout has expired.`);
     delete timeouts[username];
   }, duration * 1000);
 });
 
 client.on("ban", (channel, user, reason, bot) => {
-  client.say(channel, `User ${user} banned from ${channel} for ${reason}`);
+  sendWebhook(`User ${user} banned from ${channel} for ${reason}`);
 });
 
 client.on("raided", (channel, username, viewers) => {
-  client.say(channel, `Welcome in, all ${viewers} raiders from ${username}!`);
+  sendWebhook(`Welcome in, all ${viewers} raiders from ${username}!`);
 });
 
 client.on("message", async (channel, tags, message, self) => {
   if (self) return; // Ignore messages from the bot itself
-  sendWebhook(message)
+//  sendWebhook(message)
 //  console.log(channel)
 
   // Auto-translate messages that aren't in English
