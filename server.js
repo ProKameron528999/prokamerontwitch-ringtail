@@ -408,10 +408,21 @@ client.on('message', (channel, tags, message, self) => {
   if (!currentPoll) return;
   if (!message.startsWith('!vote ')) return;
 
-  const vote = message.split(' ')[1]?.toLowerCase();
-  if (!currentPoll.options.includes(vote)) return;
-
+  const input = message.split(' ')[1]?.toLowerCase();
   const voter = tags.username;
+
+  let vote;
+
+  // Check if the input is a number between 1 and 9 and maps to an option
+  const voteIndex = parseInt(input, 10);
+  if (!isNaN(voteIndex) && voteIndex >= 1 && voteIndex <= currentPoll.options.length) {
+    vote = currentPoll.options[voteIndex - 1];
+  } else if (currentPoll.options.includes(input)) {
+    vote = input;
+  }
+
+  if (!vote) return;
+
   currentPoll.votes[voter] = vote;
 
   // Send update to frontend
@@ -422,7 +433,7 @@ io.on('connection', (socket) => {
   socket.on('startPoll', (poll) => {
     currentPoll = {
       question: poll.question,
-      options: poll.options.map(opt => opt.toLowerCase()),
+      options: poll.options.map(opt => opt),
       votes: {}
     };
     io.emit('pollStarted', currentPoll);
