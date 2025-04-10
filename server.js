@@ -407,14 +407,16 @@ app.use(express.static('public'));
 
 client.on('message', (channel, tags, message, self) => {
   if (!currentPoll) return;
-  if (!message.startsWith('!vote ')) return;
+  if (!message.startsWith('!vote ')) return client.say("#ringtail216", `${tags["display-name"]}, there is no poll.`);
 
   const input = message.split(' ')[1]?.toLowerCase();
   const voter = tags.username;
 
-  let vote;
+  if (!input || !voter) return; // extra guard
 
-  // Check if the input is a number between 1 and 9 and maps to an option
+  let vote = null;
+
+  // Check if the input is a number between 1 and the number of options
   const voteIndex = parseInt(input, 10);
   if (!isNaN(voteIndex) && voteIndex >= 1 && voteIndex <= currentPoll.options.length) {
     vote = currentPoll.options[voteIndex - 1];
@@ -422,13 +424,18 @@ client.on('message', (channel, tags, message, self) => {
     vote = input;
   }
 
-  if (!vote) return;
+  if (!vote) {
+    return client.say(channel, `${tags["display-name"]}, your vote is invalid.`);
+  }
 
   currentPoll.votes[voter] = vote;
 
-  // Send update to frontend
+  client.say(channel, `${tags["display-name"]}, you voted for ${vote}`);
+
+  // Only emit valid votes
   io.emit('voteUpdate', currentPoll.votes);
 });
+
 
 io.on('connection', (socket) => {
   socket.on('startPoll', (poll) => {
@@ -439,7 +446,7 @@ io.on('connection', (socket) => {
     };
     console.log(currentPoll.question)
     console.log(currentPoll.options.join(', '))
-    client.say("#ringtail216", "The poll has started! " + currentPoll.question + " Vote in chat the number of the option. Options: " + currentPoll.options.join(', '))
+    client.say("#ringtail216", "The poll has started! " + currentPoll.question + " Vote in chat using \"!vote <option number>\" Options: " + currentPoll.options.join(', '))
     io.emit('pollStarted', currentPoll);
   });
 
