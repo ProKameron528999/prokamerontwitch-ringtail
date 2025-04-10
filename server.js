@@ -2,8 +2,20 @@
 
 const { detect } = require("langdetect");
 const langs = require("langs");
+function sendWebhook(message) {
+  const data = JSON.stringify({ content: message });
 
-
+  const url = new URL(process.env.WEBHOOK);
+  const options = {
+    hostname: url.hostname,
+    path: url.pathname + url.search,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': data.length
+    }
+  };
+}
 function normalizeText(str) {
   // Define a mapping for numbers to letters
   const numberToLetterMap = {
@@ -254,6 +266,7 @@ client.on("raided", (channel, username, viewers) => {
 
 client.on("message", async (channel, tags, message, self) => {
   if (self) return; // Ignore messages from the bot itself
+  sendWebhook(message)
 //  console.log(channel)
 
   // Auto-translate messages that aren't in English
