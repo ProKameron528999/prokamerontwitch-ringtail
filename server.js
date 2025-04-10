@@ -402,8 +402,18 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 let currentPoll = null;
+app.use(express.json());
 
 app.use(express.static('public'));
+app.post('/verify-key', (req, res) => {
+  const { key } = req.body;
+
+  if (key === process.env.SECRET) {
+    res.json({ success: true });
+  } else {
+    res.json({ success: false });
+  }
+});
 
 client.on('message', (channel, tags, message, self) => {
   if (self) return;
