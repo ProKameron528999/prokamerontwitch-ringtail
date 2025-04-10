@@ -403,59 +403,60 @@ const io = new Server(server);
 
 let currentPoll = null;
 
+const authorizedUsers = ['ringtail216', "ProKameron"]; // Add more usernames as needed
+
 app.use(express.static('public'));
 
 client.on('message', (channel, tags, message, self) => {
-  if (!currentPoll) return;
-  if (!message.startsWith('!vote ')) return client.say("#ringtail216", `${tags["display-name"]}, there is no poll.`);
+  const username = tags.username;
+  const displayName = tags['display-name'];
 
-  const input = message.split(' ')[1]?.toLowerCase();
-  const voter = tags.username;
+  // --- VOTING ---
+  if (message.startsWith('!vote ')) {
+    if (!currentPoll) return client.say(channel, `${displayName}, there is no poll.`);
 
-  if (!input || !voter) return; // extra guard
+    const input = message.split(' ')[1]?.toLowerCase();
+    if (!input || !username) return;
 
-  let vote = null;
+    let vote = null;
+    const voteIndex = parseInt(input, 10);
+    if (!isNaN(voteIndex) && voteIndex >= 1 && voteIndex <= currentPoll.options.length) {
+      vote = currentPoll.options[voteIndex - 1];
+    } else if (currentPoll.options.includes(input)) {
+      vote = input;
+    }
 
-  // Check if the input is a number between 1 and the number of options
-  const voteIndex = parseInt(input, 10);
-  if (!isNaN(voteIndex) && voteIndex >= 1 && voteIndex <= currentPoll.options.length) {
-    vote = currentPoll.options[voteIndex - 1];
-  } else if (currentPoll.options.includes(input)) {
-    vote = input;
+    if (!vote) {
+      return client.say(channel, `${displayName}, your vote is invalid.`);
+    }
+
+    currentPoll.votes[username] = vote;
+
+    client.say(channel, `${displayName}, you voted for ${vote}`);
+    io.emit('voteUpdate', currentPoll.votes);
   }
 
-  if (!vote) {
-    return client.say(channel, `${tags["display-name"]}, your vote is invalid.`);
+  // --- REMOVE VOTE ---
+  if (message.startsWith('!removevote ')) {
+    if (!authorizedUsers.includes(username)) {
+      return client.say(channel, `${displayName}, you are not authorized to remove votes.`);
+    }
+
+    const targetUser = message.split(' ')[1]?.toLowerCase();
+    if (!targetUser) {
+      return client.say(channel, `Usage: !removevote <username>`);
+    }
+
+    if (!currentPoll || !currentPoll.votes[targetUser]) {
+      return client.say(channel, `${displayName}, no vote found for ${targetUser}.`);
+    }
+
+    delete currentPoll.votes[targetUser];
+    client.say(channel, `${displayName} removed the vote for ${targetUser}.`);
+    io.emit('voteUpdate', currentPoll.votes);
   }
-
-  currentPoll.votes[voter] = vote;
-
-  client.say(channel, `${tags["display-name"]}, you voted for ${vote}`);
-
-  // Only emit valid votes
-  io.emit('voteUpdate', currentPoll.votes);
 });
 
-
-io.on('connection', (socket) => {
-  socket.on('startPoll', (poll) => {
-    currentPoll = {
-      question: poll.question,
-      options: poll.options.map(opt => opt),
-      votes: {}
-    };
-    console.log(currentPoll.question)
-    console.log(currentPoll.options.join(', '))
-    client.say("#ringtail216", "The poll has started! " + currentPoll.question + " Vote in chat using \"!vote <option number>\" Options: " + currentPoll.options.join(', '))
-    io.emit('pollStarted', currentPoll);
-  });
-
-  socket.on('endPoll', () => {
-    client.say("#ringtail216", "The poll has ended.")
-    io.emit('pollEnded', currentPoll);
-    currentPoll = null;
-  });
-});
 
 server.listen(3000, () => {
   console.log('Server running at http://localhost:3000');
