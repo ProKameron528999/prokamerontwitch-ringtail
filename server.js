@@ -403,22 +403,23 @@ const io = new Server(server);
 
 let currentPoll = null;
 
-const authorizedUsers = ['ringtail216', "ProKameron"]; // Add more usernames as needed
-
 app.use(express.static('public'));
 
 client.on('message', (channel, tags, message, self) => {
-  const username = tags.username;
-  const displayName = tags['display-name'];
+  if (self) return;
 
-  // --- VOTING ---
+  const username = tags.username;
+  const displayName = tags["display-name"];
+
+  // --- Handle Voting ---
   if (message.startsWith('!vote ')) {
     if (!currentPoll) return client.say(channel, `${displayName}, there is no poll.`);
 
     const input = message.split(' ')[1]?.toLowerCase();
-    if (!input || !username) return;
+    if (!input || !username) return; // extra guard
 
     let vote = null;
+
     const voteIndex = parseInt(input, 10);
     if (!isNaN(voteIndex) && voteIndex >= 1 && voteIndex <= currentPoll.options.length) {
       vote = currentPoll.options[voteIndex - 1];
@@ -436,27 +437,45 @@ client.on('message', (channel, tags, message, self) => {
     io.emit('voteUpdate', currentPoll.votes);
   }
 
-  // --- REMOVE VOTE ---
+  // --- Handle Vote Removal ---
   if (message.startsWith('!removevote ')) {
-    if (!authorizedUsers.includes(username)) {
-      return client.say(channel, `${displayName}, you are not authorized to remove votes.`);
-    }
-
     const targetUser = message.split(' ')[1]?.toLowerCase();
-    if (!targetUser) {
-      return client.say(channel, `Usage: !removevote <username>`);
-    }
+    const isAuthorized = username === 'ringtail216' || username === "prokameron"
 
-    if (!currentPoll || !currentPoll.votes[targetUser]) {
-      return client.say(channel, `${displayName}, no vote found for ${targetUser}.`);
+    if (!currentPoll) return client.say(channel, `${displayName}, there is no poll.`);
+    if (!isAuthorized) return client.say(channel, `${displayName}, you're not authorized to remove votes.`);
+
+    if (!targetUser || !currentPoll.votes[targetUser]) {
+      return client.say(channel, `${displayName}, no vote found for user "${targetUser}".`);
     }
 
     delete currentPoll.votes[targetUser];
-    client.say(channel, `${displayName} removed the vote for ${targetUser}.`);
+    client.say(channel, `${displayName} removed ${targetUser}'s vote.`);
     io.emit('voteUpdate', currentPoll.votes);
   }
 });
 
+
+
+io.on('connection', (socket) => {
+  socket.on('startPoll', (poll) => {
+    currentPoll = {
+      question: poll.question,
+      options: poll.options.map(opt => opt),
+      votes: {}
+    };
+    console.log(currentPoll.question)
+    console.log(currentPoll.options.join(', '))
+    client.say("#ringtail216", "The poll has started! " + currentPoll.question + " Vote in chat using \"!vote <option number>\" Options: " + currentPoll.options.join(', '))
+    io.emit('pollStarted', currentPoll);
+  });
+
+  socket.on('endPoll', () => {
+    client.say("#ringtail216", "The poll has ended.")
+    io.emit('pollEnded', currentPoll);
+    currentPoll = null;
+  });
+});
 
 server.listen(3000, () => {
   console.log('Server running at http://localhost:3000');
