@@ -461,12 +461,7 @@ io.on('connection', (socket) => {
       socket.emit('pollStarted', polls[id]);
       socket.emit('voteUpdate', polls[id].votes);
     }
-    socket.on('endPoll', (id) => {
-  if (polls[id]) {
-    polls[id].active = false;
-    io.to(id).emit('pollEnded');
-  }
-});
+    
   });
 });
 

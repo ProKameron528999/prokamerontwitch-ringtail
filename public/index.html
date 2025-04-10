@@ -53,13 +53,6 @@
   <input class="option" placeholder="Option 1"><br>
   <input class="option" placeholder="Option 2"><br>
   <input class="option" placeholder="Option 3"><br>
-  <input id="question" placeholder="Poll question"><br>
-  <input class="option" placeholder="Option 1"><br>
-  <input class="option" placeholder="Option 2"><br>
-  <input class="option" placeholder="Option 3"><br>  <input id="question" placeholder="Poll question"><br>
-  <input class="option" placeholder="Option 1"><br>
-  <input class="option" placeholder="Option 2"><br>
-  <input class="option" placeholder="Option 3"><br>
   <button onclick="startPoll()">Start Poll</button>
   <button onclick="endPoll()">End Poll</button>
 
@@ -67,38 +60,25 @@
     <p>🔗 Open <code>poll.html</code> in OBS as a browser source to show the live poll.</p>
   </div>
 
-<script src="/socket.io/socket.io.js"></script>
-<script>
-  const socket = io();
-  let currentPollId = null;
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    function startPoll() {
+      const question = document.getElementById('question').value;
+      const options = Array.from(document.getElementsByClassName('option'))
+        .map(i => i.value.trim()).filter(Boolean);
 
-  function startPoll() {
-    const question = document.getElementById('question').value;
-    const options = Array.from(document.getElementsByClassName('option'))
-      .map(input => input.value.trim())
-      .filter(Boolean);
+      if (!question || options.length < 2) {
+        alert('Enter a question and at least 2 options.');
+        return;
+      }
 
-    if (!question || options.length < 2) {
-      alert('Enter a question and at least 2 options.');
-      return;
+      socket.emit('startPoll', { question, options });
     }
 
-    socket.emit('startPoll', { question, options }, (response) => {
-      currentPollId = response.url.split('/').pop(); // Extract poll ID from URL
-      const url = `${window.location.origin}${response.url}`;
-      navigator.clipboard.writeText(url);
-      alert(`Poll started! Link copied: ${url}`);
-    });
-  }
-
-  function endPoll() {
-    if (!currentPollId) {
-      alert("No poll to end.");
-      return;
+    function endPoll() {
+      socket.emit('endPoll');
     }
-
-    socket.emit('endPoll', currentPollId);
-  }
-</script>
+  </script>
 </body>
 </html>
