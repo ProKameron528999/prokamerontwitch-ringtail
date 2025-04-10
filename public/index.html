@@ -74,7 +74,14 @@
     <input class="option" placeholder="Option 9"><br>
     <button onclick="startPoll()">Start Poll</button>
     <button onclick="endPoll()">End Poll</button>
-    <br><button id="togglePollVisibility" onclick="togglePollVisibility()">Toggle Poll Visibility</button>
+    <br><button onclick="toggleOverlayVisibility()">Toggle Poll Overlay Visibility</button>
+
+<script>
+  function toggleOverlayVisibility() {
+    socket.emit('togglePollVisibility');
+  }
+</script>
+
 
     <div class="embed-info">
       <p>🔗 Open <code>poll.html</code> in OBS as a browser source to show the live poll.</p>

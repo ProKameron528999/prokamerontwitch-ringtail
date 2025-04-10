@@ -410,7 +410,7 @@ app.post('/verify-key', (req, res) => {
 
   if (key === process.env.SECRET) {
     res.json({ success: true });
- //   client.say("#ringtail216", "@ringtail216, a user just accessed the poll control panel. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password.")
+    client.say("#ringtail216", "@ringtail216, a user just accessed the poll control panel. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password.")
   } else {
     res.json({ success: false });
   }
@@ -484,6 +484,9 @@ io.on('connection', (socket) => {
             }
     io.emit('pollStarted', currentPoll);
   });
+socket.on('togglePollVisibility', () => {
+  io.emit('togglePollVisibility');
+});
 
   socket.on('endPoll', () => {
     client.say("#ringtail216", "The poll has ended.")
