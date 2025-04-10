@@ -322,7 +322,7 @@ if (message.startsWith("!translate ")) {
   // Custom bot responses
   if(tags["display-name"] === "ringbot216" || tags["display-name"] === "ProKameron") {
     if(message.includes("@prokameronbot has")) {
-      const match = message.match(/has (\d+) Epice moenys/);
+      const match = message.match(/has (\d+) widgets/);
 
 const money = match ? parseInt(match[1], 10) : null;
       client.say(channel, "!givepoints @prokameron " + money)
@@ -333,7 +333,7 @@ const money = match ? parseInt(match[1], 10) : null;
     if(message.includes("pk!dodaily")) {
       client.say(channel, "!daily")
     }
-    if(message.includes("Epice moenys to @prokameron")) {
+    if(message.includes("widgets to @prokameron")) {
       client.say(channel, "!points @prokameron")
     }
   }
@@ -349,7 +349,7 @@ const money = match ? parseInt(match[1], 10) : null;
 
 
 setTimeout(() => {
-  userclient.say(channel, "!takepoints");
+  //userclient.say(channel, "!takepoints");
 }, getRandomNumber());    } else {
   //    userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
     }
