@@ -16,7 +16,7 @@ function normalizeText(str) {
     '6': 'g',
     '7': 't',
     '8': 'b',
-    '9': 'g',
+    '9': 'q',
   };
 
   return str
