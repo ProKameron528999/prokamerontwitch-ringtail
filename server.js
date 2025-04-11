@@ -317,6 +317,7 @@ client.on("ban", (channel, user, reason, bot) => {
 });
 
 client.on("raided", (channel, username, viewers) => {
+  client.say(channel, `Welcome in, all ${viewers} raiders from ${username}!`)
   sendWebhook(`Welcome in, all ${viewers} raiders from ${username}!`);
 });
 
