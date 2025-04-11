@@ -118,7 +118,6 @@ var racialslur = [
   "nick/her",
   "nickher",
   "nick her",
-  "nicka",
   "nicker",
   "niker",
   "nick gur",
@@ -186,7 +185,9 @@ var racialslur = [
 });
 
 var lessStrictSlurs = [
-  "fag"
+  "fag",
+    "nicka",
+
 ].map(function (v) {
   return v.toLowerCase();
 });
