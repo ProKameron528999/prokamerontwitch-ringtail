@@ -366,7 +366,7 @@ try {
     console.error("Translation error:", error);
 }
 
-    if (message.toLowerCase() === 'pk!uptime') {
+    if (message.toLowerCase().includes('pk!uptime')) {
     if (!botStartTime) {
       client.say(channel, 'Bot uptime not available yet.');
       return;
@@ -498,7 +498,7 @@ app.post('/verify-key', (req, res) => {
 
   if (key === process.env.SECRET) {
     res.json({ success: true });
- //   client.say("#ringtail216", "@ringtail216, a user just accessed the poll control panel. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password.")
+    client.say("#ringtail216", "@ringtail216, a user just accessed the poll control panel. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password.")
   } else {
     res.json({ success: false });
   }
