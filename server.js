@@ -19,7 +19,7 @@ function sendWebhook(message) {
   };
     const req = https.request(options, res => {
     if (res.statusCode === 204) {
-      console.log('Message sent successfully.');
+ //     console.log('Message sent successfully.');
     } else {
       console.error(`Failed to send message. Status code: ${res.statusCode}`);
     }
@@ -48,7 +48,7 @@ function sendWebhookMessage(message) {
   };
     const req = https.request(options, res => {
     if (res.statusCode === 204) {
-      console.log('Message sent successfully.');
+    //  console.log('Message sent successfully.');
     } else {
       console.error(`Failed to send message. Status code: ${res.statusCode}`);
     }
