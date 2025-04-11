@@ -1,6 +1,8 @@
 //process.exit();
 const https = require('https');
 
+let botStartTime;
+
 
 const { detect } = require("langdetect");
 const langs = require("langs");
@@ -323,6 +325,7 @@ client.on("raided", (channel, username, viewers) => {
 
 client.on("message", async (channel, tags, message, self) => {
   if (self) return; // Ignore messages from the bot itself
+  console.log(client.uptime)
 //  sendWebhook(message)
 //  console.log(channel)
 
@@ -363,7 +366,22 @@ try {
     console.error("Translation error:", error);
 }
 
-  
+    if (message.toLowerCase() === 'pk!uptime') {
+    if (!botStartTime) {
+      client.say(channel, 'Bot uptime not available yet.');
+      return;
+    }
+
+    const now = Date.now();
+    const uptimeMs = now - botStartTime;
+
+    const seconds = Math.floor(uptimeMs / 1000) % 60;
+    const minutes = Math.floor(uptimeMs / (1000 * 60)) % 60;
+    const hours = Math.floor(uptimeMs / (1000 * 60 * 60));
+
+    const uptime = `${hours}h ${minutes}m ${seconds}s`;
+    client.say(channel, `Bot has been running for ${uptime}`);
+  }
   
 if (message.startsWith("!translate ")) {
     try {
@@ -569,7 +587,10 @@ server.listen(3000, () => {
   console.log('Server running at http://localhost:3000');
 });
 // Connect to Twitch chat
-client.connect().catch(console.error);
+client.connect().then(() => {
+                           botStartTime = Date.now(); // Store the time when the bot connects
+
+                         }).catch(console.error);
 userclient.connect().catch(console.error);
 
 
