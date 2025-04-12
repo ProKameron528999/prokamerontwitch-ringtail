@@ -1,8 +1,7 @@
 //process.exit();
-const https = require('https');
+const https = require("https");
 
 let botStartTime;
-
 
 const { detect } = require("langdetect");
 const langs = require("langs");
@@ -13,22 +12,22 @@ function sendWebhook(message) {
   const options = {
     hostname: url.hostname,
     path: url.pathname + url.search,
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': data.length
-    }
+      "Content-Type": "application/json",
+      "Content-Length": data.length,
+    },
   };
-    const req = https.request(options, res => {
+  const req = https.request(options, (res) => {
     if (res.statusCode === 204) {
- //     console.log('Message sent successfully.');
+      //     console.log('Message sent successfully.');
     } else {
       console.error(`Failed to send message. Status code: ${res.statusCode}`);
     }
   });
 
-  req.on('error', error => {
-    console.error('Error sending message:', error);
+  req.on("error", (error) => {
+    console.error("Error sending message:", error);
   });
 
   req.write(data);
@@ -42,77 +41,78 @@ function sendWebhookMessage(message) {
   const options = {
     hostname: url.hostname,
     path: url.pathname + url.search,
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': data.length
-    }
+      "Content-Type": "application/json",
+      "Content-Length": data.length,
+    },
   };
-    const req = https.request(options, res => {
+  const req = https.request(options, (res) => {
     if (res.statusCode === 204) {
-    //  console.log('Message sent successfully.');
+      //  console.log('Message sent successfully.');
     } else {
       console.error(`Failed to send message. Status code: ${res.statusCode}`);
     }
   });
 
-  req.on('error', error => {
-    console.error('Error sending message:', error);
+  req.on("error", (error) => {
+    console.error("Error sending message:", error);
   });
 
   req.write(data);
   req.end();
 }
 
-
 function normalizeText(str) {
   // Define a mapping for numbers to letters
   const numberToLetterMap = {
-    '0': 'o',  // You can add more mappings as needed
-    '1': 'i',
-    '2': 'z',
-    '3': 'e',
-    '4': 'a',
-    '5': 's',
-    '6': 'g',
-    '7': 't',
-    '8': 'b',
-    '9': 'q',
+    0: "o", // You can add more mappings as needed
+    1: "i",
+    2: "z",
+    3: "e",
+    4: "a",
+    5: "s",
+    6: "g",
+    7: "t",
+    8: "b",
+    9: "q",
   };
 
   return str
-    .normalize('NFD')                      // Break down diacritics
-    .replace(/[\u0300-\u036f]/g, '')       // Remove diacritics
-    .replace(/[^a-zA-Z0-9]/g, "")          // Remove non-alphanumeric characters
-    .replace(/[^\x00-\x7F]/g, '')          // Strip non-ASCII (optional)
-    .replace(/[0-9]/g, (match) => numberToLetterMap[match] || match)  // Replace numbers with letters
-    .replace(/[jlj]/g, 'i')                // Replace 'j' and 'l' with 'i'
-    .toLowerCase();                        // Convert to lowercase
+    .normalize("NFD") // Break down diacritics
+    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+    .replace(/[^a-zA-Z0-9]/g, "") // Remove non-alphanumeric characters
+    .replace(/[^\x00-\x7F]/g, "") // Strip non-ASCII (optional)
+    .replace(/[0-9]/g, (match) => numberToLetterMap[match] || match) // Replace numbers with letters
+    .replace(/[jlj]/g, "i") // Replace 'j' and 'l' with 'i'
+    .toLowerCase(); // Convert to lowercase
 }
 
 function lessnormalizeText(str) {
   // Define a mapping for numbers to letters
   const numberToLetterMap = {
-    '0': 'o',  // You can add more mappings as needed
-    '1': 'i',
-    '2': 'z',
-    '3': 'e',
-    '4': 'a',
-    '5': 's',
-    '6': 'g',
-    '7': 't',
-    '8': 'b',
-    '9': 'g',
+    0: "o", // You can add more mappings as needed
+    1: "i",
+    2: "z",
+    3: "e",
+    4: "a",
+    5: "s",
+    6: "g",
+    7: "t",
+    8: "b",
+    9: "g",
   };
 
-  return str
-    .normalize('NFD')                      // Break down diacritics
-    .replace(/[\u0300-\u036f]/g, '')       // Remove diacritics
-  //  .replace(/[^a-zA-Z0-9]/g, "")          // Remove non-alphanumeric characters
-    .replace(/[^\x00-\x7F]/g, '')          // Strip non-ASCII (optional)
-    .replace(/[0-9]/g, (match) => numberToLetterMap[match] || match)  // Replace numbers with letters
-    .replace(/[jlj]/g, 'i')                // Replace 'j' and 'l' with 'i'
-    .toLowerCase();                        // Convert to lowercase
+  return (
+    str
+      .normalize("NFD") // Break down diacritics
+      .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+      //  .replace(/[^a-zA-Z0-9]/g, "")          // Remove non-alphanumeric characters
+      .replace(/[^\x00-\x7F]/g, "") // Strip non-ASCII (optional)
+      .replace(/[0-9]/g, (match) => numberToLetterMap[match] || match) // Replace numbers with letters
+      .replace(/[jlj]/g, "i") // Replace 'j' and 'l' with 'i'
+      .toLowerCase()
+  ); // Convert to lowercase
 }
 
 var racialslur = [
@@ -125,7 +125,7 @@ var racialslur = [
   "nick gur",
   "Nісk gur",
   "nickgur",
-    "niiigg",
+  "niiigg",
   "niiiigg",
   "niiiiigg",
   "niiiiii",
@@ -186,23 +186,17 @@ var racialslur = [
   return v.toLowerCase();
 });
 
-var lessStrictSlurs = [
-  "fag",
-    "nicka",
-
-].map(function (v) {
+var lessStrictSlurs = ["fag", "nicka"].map(function (v) {
   return v.toLowerCase();
 });
 
 const ran = require("./lib/random");
 const tmi = require("tmi.js");
-const http = require('http');
+const http = require("http");
 
+const { Server } = require("socket.io");
 
-
-const { Server } = require('socket.io');
-
-const express = require('express');
+const express = require("express");
 
 const translate = require("translate-google");
 
@@ -249,66 +243,74 @@ const client = new tmi.Client({
   channels: [channelName],
 });
 
-
 function log(message) {
   const now = new Date().toLocaleTimeString("en-US", { hour12: false });
   console.log(`[${now}] info: ${message}`);
 }
 
-
-client.on('connecting', () => log('Connecting to irc-ws.chat.twitch.tv on port 443..'));
-client.on('connected', (address, port) => {
-  log('Connected to server.');
-  log("Joining #ringtail216")
+client.on("connecting", () =>
+  log("Connecting to irc-ws.chat.twitch.tv on port 443..")
+);
+client.on("connected", (address, port) => {
+  log("Connected to server.");
+  log("Joining #ringtail216");
 });
 
-client.on('logon', (address, port) => {
-  log('Sending authentication to server..');
+client.on("logon", (address, port) => {
+  log("Sending authentication to server..");
 });
 
 client.on("reconnect", () => {
-    log("Reconnecting...")
+  log("Reconnecting...");
 });
 
 client.on("serverchange", (channel) => {
-    log("The server has changed.")
+  log("The server has changed.");
 });
 
-client.on('disconnected', (address, port) => {
-  log('Disconnected from server.');
+client.on("disconnected", (address, port) => {
+  log("Disconnected from server.");
 });
-client.on('part', (channel, username_, self) => {
+client.on("part", (channel, username_, self) => {
   if (self) log(`Left ${channel}`);
 });
-client.on('join', (channel, username_, self) => {
+client.on("join", (channel, username_, self) => {
   if (self) log(`Joined ${channel}`);
 });
-client.on('message', (channel, tags, message, self) => {
-//  if (!self) {
-    log(`[${channel}] <${tags['display-name'] || tags.username}>: ${message}`);
-    const containsSlur = racialslur.some((word) => normalizeText(message).includes(word)) ||
-                              lessStrictSlurs.some((word) => lessnormalizeText(message).includes(word));
-    if(containsSlur) {
-      sendWebhookMessage(`[${channel}] <${tags['display-name'] || tags.username}>: [SLUR CENSORED]`)
-    } else {
-      sendWebhookMessage(`[${channel}] <${tags['display-name'] || tags.username}>: ${message}`)
-//    }
+client.on("message", (channel, tags, message, self) => {
+  //  if (!self) {
+  log(`[${channel}] <${tags["display-name"] || tags.username}>: ${message}`);
+  const containsSlur =
+    racialslur.some((word) => normalizeText(message).includes(word)) ||
+    lessStrictSlurs.some((word) => lessnormalizeText(message).includes(word));
+  if (containsSlur) {
+    sendWebhookMessage(
+      `[${channel}] <${tags["display-name"] || tags.username}>: [SLUR CENSORED]`
+    );
+  } else {
+    sendWebhookMessage(
+      `[${channel}] <${tags["display-name"] || tags.username}>: ${message}`
+    );
+    //    }
   }
 });
 
 client.on("clearchat", (channel) => {
-    client.say("The chat was cleared. Hi everyone!")
+  client.say("The chat was cleared. Hi everyone!");
 });
-
 
 let timeouts = {};
 
 client.on("timeout", (channel, username, reason, duration, tags) => {
-  sendWebhook(`User ${username} has been timed out in ${channel} for ${duration} seconds for reason: ${reason || "No reason provided"}`);
+  sendWebhook(
+    `User ${username} has been timed out in ${channel} for ${duration} seconds for reason: ${
+      reason || "No reason provided"
+    }`
+  );
   timeouts[username] = Date.now() + duration * 1000;
 
   setTimeout(() => {
-    sendWebhook(`[Timeout tracker] ${username}'s timeout has expired.`)
+    sendWebhook(`[Timeout tracker] ${username}'s timeout has expired.`);
     client.say(channel, `[Timeout tracker] ${username}'s timeout has expired.`);
     delete timeouts[username];
   }, duration * 1000);
@@ -319,56 +321,117 @@ client.on("ban", (channel, user, reason, bot) => {
 });
 
 client.on("raided", (channel, username, viewers) => {
-  client.say(channel, `Welcome in, all ${viewers} raiders from ${username}!`)
+  client.say(channel, `Welcome in, all ${viewers} raiders from ${username}!`);
   sendWebhook(`Welcome in, all ${viewers} raiders from ${username}!`);
 });
 
 client.on("message", async (channel, tags, message, self) => {
   if (self) return; // Ignore messages from the bot itself
-  console.log(client.uptime)
-//  sendWebhook(message)
-//  console.log(channel)
+  console.log(client.uptime);
+  //  sendWebhook(message)
+  //  console.log(channel)
 
   // Auto-translate messages that aren't in English
-try {
+  try {
     const detected = detect(message);
     const detectedLangCode = detected[0]?.lang || "unknown"; // Extract language code safely
     console.log(detectedLangCode);
+    if (message.startsWith("pk!translate ")) {
+      try {
+        const msgToTranslate = message.replace("pk!translate ", "").trim();
+
+        const detected = detect(msgToTranslate);
+        const detectedLangCode = detected[0]?.lang || "unknown";
+        const langData = langs.where("1", detectedLangCode);
+        let detectedLangName = langData ? langData.name : "Unknown";
+
+        if (detectedLangName === "Unknown") {
+          switch (detectedLangCode) {
+            case "zh-cn":
+              detectedLangName = "Chinese (Simplified)";
+              break;
+            case "zh-tw":
+              detectedLangName = "Chinese (Traditional)";
+              break;
+          }
+        }
+
+        let translated = await translate(msgToTranslate, { to: "en" });
+
+        const containsSlur =
+          racialslur.some((word) => normalizeText(translated).includes(word)) ||
+          lessStrictSlurs.some((word) =>
+            lessnormalizeText(translated).includes(word)
+          );
+
+        if (containsSlur) {
+          client.say(
+            channel,
+            `${tags["display-name"]} tried to translate a SLUR! @ringtail216`
+          );
+        } else {
+          client.say(
+            channel,
+            `${tags["display-name"]}, From ${detectedLangName}, the text you provided says "${translated}"`
+          );
+        }
+      } catch (error) {
+        console.error("pk!translate error:", error);
+        client.say(channel, "Something went wrong while translating.");
+      }
+    }
 
     // Convert the language code to a full language name
     const langData = langs.where("1", detectedLangCode);
     let detectedLangName = langData ? langData.name : "Unknown";
 
     if (detectedLangName === "Unknown") {
-        switch (detectedLangCode) {
-            case "zh-cn": detectedLangName = "Chinese (Simplified)"; break;
-            case "zh-tw": detectedLangName = "Chinese (Traditional)"; break;
-        }
+      switch (detectedLangCode) {
+        case "zh-cn":
+          detectedLangName = "Chinese (Simplified)";
+          break;
+        case "zh-tw":
+          detectedLangName = "Chinese (Traditional)";
+          break;
+      }
     }
 
-    const noTranslateWords = ["!modroulette", "!sr", "!daily","!setuptierlist"]; // Add words you don't want translated
+    const noTranslateWords = [
+      "!modroulette",
+      "!sr",
+      "!daily",
+      "!setuptierlist",
+    ]; // Add words you don't want translated
 
-    const containsNoTranslateWord = noTranslateWords.some(word =>
-        message.toLowerCase().includes(word.toLowerCase())
+    const containsNoTranslateWord = noTranslateWords.some((word) =>
+      message.toLowerCase().includes(word.toLowerCase())
     );
 
     if (detectedLangCode !== "en" && !containsNoTranslateWord) {
-        let translated = await translate(message, { to: "en" });
+      let translated = await translate(message, { to: "en" });
 
-        // If the message changes after translation, it means it's not in English
-        if (translated.toLowerCase() !== message.toLowerCase()) {
-            if (racialslur.some((word) => normalizeText(message).includes(word)) || lessStrictSlurs.some((word) => lessnormalizeText(message).includes(word))) {
-                client.say(channel, `${tags["display-name"]} said a slur in a different language. Please take action, @ringtail216`);
-            }
+      // If the message changes after translation, it means it's not in English
+      if (translated.toLowerCase() !== message.toLowerCase()) {
+        if (
+          racialslur.some((word) => normalizeText(message).includes(word)) ||
+          lessStrictSlurs.some((word) =>
+            lessnormalizeText(message).includes(word)
+          )
+        ) {
+          client.say(
+            channel,
+            `${tags["display-name"]} said a slur in a different language. Please take action, @ringtail216`
+          );
         }
+      }
     }
-} catch (error) {
+  } catch (error) {
     console.error("Translation error:", error);
-}
+  }
 
-    if (message.toLowerCase().includes('pk!uptime')) {
+  if (message.toLowerCase().includes("pk!uptime")) {
     if (!botStartTime) {
-      client.say(channel, 'Bot uptime not available yet.');
+      client.say(channel, "Bot uptime not available yet.");
       return;
     }
 
@@ -382,43 +445,67 @@ try {
     const uptime = `${hours}h ${minutes}m ${seconds}s`;
     client.say(channel, `Bot has been running for ${uptime}`);
   }
-  
-if (message.startsWith("!translate ")) {
+
+  if (message.startsWith("pk!translate ")) {
     try {
-        const msgToTranslate = message.replace("!translate ", "").trim();
+      const msgToTranslate = message.replace("pk!translate ", "").trim();
 
-        const detected = detect(msgToTranslate);
-        const detectedLangCode = detected[0]?.lang || "unknown";
-        const langData = langs.where("1", detectedLangCode);
-        let detectedLangName = langData ? langData.name : "Unknown";
+      const detected = detect(msgToTranslate);
+      const detectedLangCode = detected[0]?.lang || "unknown";
+      const langData = langs.where("1", detectedLangCode);
+      let detectedLangName = langData ? langData.name : "Unknown";
 
-        if (detectedLangName === "Unknown") {
-            switch (detectedLangCode) {
-                case "zh-cn": detectedLangName = "Chinese (Simplified)"; break;
-                case "zh-tw": detectedLangName = "Chinese (Traditional)"; break;
-            }
+      if (detectedLangName === "Unknown") {
+        switch (detectedLangCode) {
+          case "zh-cn":
+            detectedLangName = "Chinese (Simplified)";
+            break;
+          case "zh-tw":
+            detectedLangName = "Chinese (Traditional)";
+            break;
         }
+      }
 
-        let translated = await translate(msgToTranslate, { to: "en" });
+      let translated = await translate(msgToTranslate, { to: "en" });
 
-        const containsSlur = racialslur.some((word) => normalizeText(translated).includes(word)) ||
-                              lessStrictSlurs.some((word) => lessnormalizeText(translated).includes(word));
+      const containsSlur =
+        racialslur.some((word) => normalizeText(translated).includes(word)) ||
+        lessStrictSlurs.some((word) =>
+          lessnormalizeText(translated).includes(word)
+        );
 
-        if (containsSlur) {
-            client.say(channel, `${tags["display-name"]} tried to translate a SLUR! @ringtail216`);
-        } else {
-            client.say(channel, `${tags["display-name"]}, From ${detectedLangName}, the text you provided says "${translated}"`);
-        }
-
+      if (containsSlur) {
+        client.say(
+          channel,
+          `${tags["display-name"]} tried to translate a SLUR! @ringtail216`
+        );
+      } else {
+        client.say(
+          channel,
+          `${tags["display-name"]}, From ${detectedLangName}, the text you provided says "${translated}"`
+        );
+      }
     } catch (error) {
-        console.error("!translate error:", error);
-        client.say(channel, "Something went wrong while translating.");
+      console.error("pk!translate error:", error);
+      client.say(channel, "Something went wrong while translating.");
     }
-}
+  }
 
+  if (message.startsWith("pk!randomnumber ")) {
+    try {
+      const number = message.replace("pk!randomnumber ", "").trim();
+      client.say(channel, "The random number is " + Math.floor(ran.random(number)))
+    } catch (error) {
+      console.error("pk!translate error:", error);
+      client.say(channel, "Something went wrong while generating a random number.");
+    }
+  }
   // Custom bot responses
-  if(tags["display-name"] === "ringbot216" || tags["display-name"] === "ProKameron") {
-   /* if(message.includes("@prokameronbot has")) {
+  if (
+    tags["display-name"] === "ringbot216" ||
+    tags["display-name"] === "ProKameron"
+  ) {
+    /* if(message.includes("@prokameronbot has")) {
       const match = message.match(/has (\d+) widgets/);
 
 const money = match ? parseInt(match[1], 10) : null;
@@ -430,42 +517,56 @@ const money = match ? parseInt(match[1], 10) : null;
     if(message.includes("pk!dodaily")) {
       client.say(channel, "!daily")
     }*/
-    if(message.includes("widgets to @prokameron")) {
-      client.say(channel, "!points @prokameron")
+    if (message.includes("widgets to @prokameron")) {
+      client.say(channel, "!points @prokameron");
     }
   }
   if (
-    message.includes("Epic moenys have been distributed. Time to gamble! LETSGO") ||
-    message.includes("@ringtail216 received")|| 
+    message.includes(
+      "Epic moenys have been distributed. Time to gamble! LETSGO"
+    ) ||
+    message.includes("@ringtail216 received") ||
     message.includes("Epice moenys to @ringtail216")
   ) {
     if (tags["display-name"] === "ringbot216") {
       function getRandomNumber(min = 750, max = 3000) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
 
-
-setTimeout(() => {
-  //userclient.say(channel, "!takepoints");
-}, getRandomNumber());    } else {
-  //    userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
+      setTimeout(() => {
+        //userclient.say(channel, "!takepoints");
+      }, getRandomNumber());
+    } else {
+      //    userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
     }
   }
-              if (racialslur.some((word) => normalizeText(message).includes(word))) {
-                client.say(channel, `${tags["display-name"]}, Slurs are not allowed!`)
-            }
+  if (racialslur.some((word) => normalizeText(message).includes(word))) {
+    client.say(channel, `${tags["display-name"]}, Slurs are not allowed!`);
+  }
 
-  if (message.toLowerCase().includes("pk!whoami") && tags["display-name"] !== "jumbojosh2ndbiggestfan") {
+  if (
+    message.toLowerCase().includes("pk!whoami") &&
+    tags["display-name"] !== "jumbojosh2ndbiggestfan"
+  ) {
     let status = "Regular chatter";
     if (tags["mod"]) status = "Moderator";
     if (tags["vip"]) status = "VIP";
     if (tags["user-type"] === "broadcaster") status = "Broadcaster";
 
-    client.say(channel, `You are ${tags["display-name"]}, a ${status} with the color ${tags["color"]}. Your user ID is ${tags["user-id"]}`);
+    client.say(
+      channel,
+      `You are ${tags["display-name"]}, a ${status} with the color ${tags["color"]}. Your user ID is ${tags["user-id"]}`
+    );
   }
 
-  if (message.toLowerCase().includes("pk!coinflip") && tags["display-name"] !== "jumbojosh2ndbiggestfan") {
-    client.say(channel, `${tags["display-name"]}, it's ${ran.choose(["Heads", "Tails"])}!`);
+  if (
+    message.toLowerCase().includes("pk!coinflip") &&
+    tags["display-name"] !== "jumbojosh2ndbiggestfan"
+  ) {
+    client.say(
+      channel,
+      `${tags["display-name"]}, it's ${ran.choose(["Heads", "Tails"])}!`
+    );
   }
 
   if (
@@ -473,17 +574,12 @@ setTimeout(() => {
     message.toLowerCase().includes("!ban @prokameron")
   ) {
     let response = ran.chooseAngryResponse();
-    userclient.say(channel, `[AUTO-RESPONSE] ${response} ${tags["display-name"]} (response #${response.index})`);
+    userclient.say(
+      channel,
+      `[AUTO-RESPONSE] ${response} ${tags["display-name"]} (response #${response.index})`
+    );
   }
 });
-
-
-
-
-
-
-
-
 
 const app = express();
 const server = http.createServer(app);
@@ -492,35 +588,43 @@ const io = new Server(server);
 let currentPoll = null;
 app.use(express.json());
 
-app.use(express.static('public'));
-app.post('/verify-key', (req, res) => {
+app.use(express.static("public"));
+app.post("/verify-key", (req, res) => {
   const { key } = req.body;
 
   if (key === process.env.SECRET) {
     res.json({ success: true });
-    client.say("#ringtail216", "@ringtail216, a user just accessed the poll control panel. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password.")
+    client.say(
+      "#ringtail216",
+      "@ringtail216, a user just accessed the poll control panel. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password."
+    );
   } else {
     res.json({ success: false });
   }
 });
 
-client.on('message', (channel, tags, message, self) => {
+client.on("message", (channel, tags, message, self) => {
   if (self) return;
 
   const username = tags.username;
   const displayName = tags["display-name"];
 
   // --- Handle Voting ---
-  if (message.startsWith('!vote ')) {
-    if (!currentPoll) return client.say(channel, `${displayName}, there is no poll.`);
+  if (message.startsWith("!vote ")) {
+    if (!currentPoll)
+      return client.say(channel, `${displayName}, there is no poll.`);
 
-    const input = message.split(' ')[1]?.toLowerCase();
+    const input = message.split(" ")[1]?.toLowerCase();
     if (!input || !username) return; // extra guard
 
     let vote = null;
 
     const voteIndex = parseInt(input, 10);
-    if (!isNaN(voteIndex) && voteIndex >= 1 && voteIndex <= currentPoll.options.length) {
+    if (
+      !isNaN(voteIndex) &&
+      voteIndex >= 1 &&
+      voteIndex <= currentPoll.options.length
+    ) {
       vote = currentPoll.options[voteIndex - 1];
     } else if (currentPoll.options.includes(input)) {
       vote = input;
@@ -533,66 +637,87 @@ client.on('message', (channel, tags, message, self) => {
     currentPoll.votes[username] = vote;
 
     client.say(channel, `${displayName}, you voted for ${vote}`);
-    io.emit('voteUpdate', currentPoll.votes);
+    io.emit("voteUpdate", currentPoll.votes);
   }
 
   // --- Handle Vote Removal ---
-  if (message.startsWith('!removevote ')) {
-    const targetUser = message.split(' ')[1]?.toLowerCase();
-    const isAuthorized = username === 'ringtail216' || username === "prokameron"
+  if (message.startsWith("!removevote ")) {
+    const targetUser = message.split(" ")[1]?.toLowerCase();
+    const isAuthorized =
+      username === "ringtail216" || username === "prokameron";
 
-    if (!currentPoll) return client.say(channel, `${displayName}, there is no poll.`);
-    if (!isAuthorized) return client.say(channel, `${displayName}, you're not authorized to remove votes.`);
+    if (!currentPoll)
+      return client.say(channel, `${displayName}, there is no poll.`);
+    if (!isAuthorized)
+      return client.say(
+        channel,
+        `${displayName}, you're not authorized to remove votes.`
+      );
 
     if (!targetUser || !currentPoll.votes[targetUser]) {
-      return client.say(channel, `${displayName}, no vote found for user "${targetUser}".`);
+      return client.say(
+        channel,
+        `${displayName}, no vote found for user "${targetUser}".`
+      );
     }
 
     delete currentPoll.votes[targetUser];
     client.say(channel, `${displayName} removed ${targetUser}'s vote.`);
-    io.emit('voteUpdate', currentPoll.votes);
+    io.emit("voteUpdate", currentPoll.votes);
   }
 });
 
-
-
-io.on('connection', (socket) => {
-  socket.on('startPoll', (poll) => {
+io.on("connection", (socket) => {
+  socket.on("startPoll", (poll) => {
     currentPoll = {
       question: poll.question,
-      options: poll.options.map(opt => opt),
-      votes: {}
+      options: poll.options.map((opt) => opt),
+      votes: {},
     };
-    console.log(currentPoll.question)
-    console.log(currentPoll.options.join(', '))
-    if (racialslur.some((word) => normalizeText(currentPoll.options.join(", ")).includes(word))) {
-                client.say("#ringtail216", `WARNING! SOMEONE ENTERED A POTENTIAL SLUR INTO THE POLL SYSTEM! THE PASSWORD MAY HAVE BEEN LEAKED! @ringtail216 @prokameron`)
-            } else {
-    client.say("#ringtail216", "The poll has started! " + currentPoll.question + " Vote in chat using \"!vote <option number>\" Options: " + currentPoll.options.join(', '))
-            }
-    io.emit('pollStarted', currentPoll);
+    console.log(currentPoll.question);
+    console.log(currentPoll.options.join(", "));
+    if (
+      racialslur.some((word) =>
+        normalizeText(currentPoll.options.join(", ")).includes(word)
+      )
+    ) {
+      client.say(
+        "#ringtail216",
+        `WARNING! SOMEONE ENTERED A POTENTIAL SLUR INTO THE POLL SYSTEM! THE PASSWORD MAY HAVE BEEN LEAKED! @ringtail216 @prokameron`
+      );
+    } else {
+      client.say(
+        "#ringtail216",
+        "The poll has started! " +
+          currentPoll.question +
+          ' Vote in chat using "!vote <option number>" Options: ' +
+          currentPoll.options.join(", ")
+      );
+    }
+    io.emit("pollStarted", currentPoll);
   });
-socket.on('togglePollVisibility', () => {
-  io.emit('togglePollVisibility');
-});
+  socket.on("togglePollVisibility", () => {
+    io.emit("togglePollVisibility");
+  });
 
-  socket.on('endPoll', () => {
-    client.say("#ringtail216", "The poll has ended.")
-    io.emit('pollEnded', currentPoll);
+  socket.on("endPoll", () => {
+    client.say("#ringtail216", "The poll has ended.");
+    io.emit("pollEnded", currentPoll);
     currentPoll = null;
   });
 });
 
 server.listen(3000, () => {
-  console.log('Server running at http://localhost:3000');
+  console.log("Server running at http://localhost:3000");
 });
 // Connect to Twitch chat
-client.connect().then(() => {
-                           botStartTime = Date.now(); // Store the time when the bot connects
-
-                         }).catch(console.error);
+client
+  .connect()
+  .then(() => {
+    botStartTime = Date.now(); // Store the time when the bot connects
+  })
+  .catch(console.error);
 userclient.connect().catch(console.error);
-
 
 process.on("unhandledRejection", (reason, p) => {
   console.error(reason, p);
