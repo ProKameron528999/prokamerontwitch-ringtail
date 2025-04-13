@@ -75,11 +75,27 @@
     <button onclick="startPoll()">Start Poll</button>
     <button onclick="endPoll()">End Poll</button>
     <br><button onclick="toggleOverlayVisibility()">Toggle Poll Overlay Visibility</button>
+    <div id="voteStats" style="margin-top: 20px; text-align: left;">
+  <h3>Total Votes: <span id="totalVotes">0</span></h3>
+  <div id="voterList" style="white-space: pre-wrap; font-family: monospace;"></div>
+</div>
+
 
 <script>
   function toggleOverlayVisibility() {
     socket.emit('togglePollVisibility');
   }
+  socket.on("voteUpdate", (votes) => {
+  const totalVotesEl = document.getElementById("totalVotes");
+  const voterListEl = document.getElementById("voterList");
+
+  const entries = Object.entries(votes);
+  totalVotesEl.textContent = entries.length;
+
+  const display = entries.map(([user, vote]) => `${user}: ${vote}`).join("\n");
+  voterListEl.textContent = display;
+});
+
 </script>
 
 
