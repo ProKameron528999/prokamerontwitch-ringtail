@@ -586,15 +586,20 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 let currentPoll = null;
-app.use(express.json());
+const blacklist = ["ringbot216"];
 
+app.use(express.json());
 app.use(express.static("public"));
+
 app.post("/verify-key", (req, res) => {
   const { key } = req.body;
 
   if (key === process.env.SECRET) {
     res.json({ success: true });
-    client.say("#ringtail216","@ringtail216, a user just accessed the poll control panel. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password.");
+    client.say(
+      "#ringtail216",
+      "@ringtail216, a user just accessed the poll control panel. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password."
+    );
   } else {
     res.json({ success: false });
   }
@@ -605,18 +610,25 @@ client.on("message", (channel, tags, message, self) => {
 
   const username = tags.username;
   const displayName = tags["display-name"];
+  if (blacklist.includes(username)) return;
+
+  const lowerMsg = message.trim().toLowerCase();
 
   // --- Handle Voting ---
-  if (message.startsWith("!vote ")) {
-    if (!currentPoll)
-      return client.say(channel, `${displayName}, there is no poll.`);
+  let input = null;
 
-    const input = message.split(" ")[1]?.toLowerCase();
-    if (!input || !username) return; // extra guard
+  if (lowerMsg.startsWith("!vote ")) {
+    input = lowerMsg.split(" ")[1];
+  } else if (/^\d+$/.test(lowerMsg)) {
+    input = lowerMsg;
+  } else if (currentPoll?.options.includes(lowerMsg)) {
+    input = lowerMsg;
+  }
 
+  if (input && currentPoll) {
     let vote = null;
-
     const voteIndex = parseInt(input, 10);
+
     if (
       !isNaN(voteIndex) &&
       voteIndex >= 1 &&
@@ -627,36 +639,22 @@ client.on("message", (channel, tags, message, self) => {
       vote = input;
     }
 
-    if (!vote) {
-      return client.say(channel, `${displayName}, your vote is invalid.`);
+    if (vote) {
+      currentPoll.votes[username] = vote;
+      io.emit("voteUpdate", currentPoll.votes);
     }
-
-    currentPoll.votes[username] = vote;
-
-    client.say(channel, `${displayName}, you voted for ${vote}`);
-    io.emit("voteUpdate", currentPoll.votes);
   }
 
   // --- Handle Vote Removal ---
-  if (message.startsWith("!removevote ")) {
-    const targetUser = message.split(" ")[1]?.toLowerCase();
+  if (lowerMsg.startsWith("!removevote ")) {
+    const targetUser = lowerMsg.split(" ")[1]?.toLowerCase();
     const isAuthorized =
       username === "ringtail216" || username === "prokameron";
 
-    if (!currentPoll)
-      return client.say(channel, `${displayName}, there is no poll.`);
-    if (!isAuthorized)
-      return client.say(
-        channel,
-        `${displayName}, you're not authorized to remove votes.`
-      );
+    if (!currentPoll) return;
+    if (!isAuthorized) return;
 
-    if (!targetUser || !currentPoll.votes[targetUser]) {
-      return client.say(
-        channel,
-        `${displayName}, no vote found for user "${targetUser}".`
-      );
-    }
+    if (!targetUser || !currentPoll.votes[targetUser]) return;
 
     delete currentPoll.votes[targetUser];
     client.say(channel, `${displayName} removed ${targetUser}'s vote.`);
@@ -687,12 +685,13 @@ io.on("connection", (socket) => {
         "#ringtail216",
         "The poll has started! " +
           currentPoll.question +
-          ' Vote in chat using "!vote <option number>" Options: ' +
+          ' Vote in chat using "!vote <option number>" or just type the number. Options: ' +
           currentPoll.options.join(", ")
       );
     }
     io.emit("pollStarted", currentPoll);
   });
+
   socket.on("togglePollVisibility", () => {
     io.emit("togglePollVisibility");
   });
@@ -707,6 +706,7 @@ io.on("connection", (socket) => {
 server.listen(3000, () => {
   console.log("Server running at http://localhost:3000");
 });
+
 // Connect to Twitch chat
 client
   .connect()
