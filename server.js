@@ -594,7 +594,7 @@ app.post("/verify-key", (req, res) => {
 
   if (key === process.env.SECRET) {
     res.json({ success: true });
-   // client.say("#ringtail216","@ringtail216, a user just accessed the poll control panel. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password.");
+    client.say("#ringtail216","@ringtail216, a user just accessed the poll control panel. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password.");
   } else {
     res.json({ success: false });
   }
@@ -683,13 +683,13 @@ io.on("connection", (socket) => {
         `WARNING! SOMEONE ENTERED A POTENTIAL SLUR INTO THE POLL SYSTEM! THE PASSWORD MAY HAVE BEEN LEAKED! @ringtail216 @prokameron`
       );
     } else {
-    /*  client.say(
+      client.say(
         "#ringtail216",
         "The poll has started! " +
           currentPoll.question +
           ' Vote in chat using "!vote <option number>" Options: ' +
           currentPoll.options.join(", ")
-      );*/
+      );
     }
     io.emit("pollStarted", currentPoll);
   });

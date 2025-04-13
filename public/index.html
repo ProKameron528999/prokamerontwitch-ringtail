@@ -75,17 +75,29 @@
     <button onclick="startPoll()">Start Poll</button>
     <button onclick="endPoll()">End Poll</button>
     <br><button onclick="toggleOverlayVisibility()">Toggle Poll Overlay Visibility</button>
-    <div id="voteStats" style="margin-top: 20px; text-align: left;">
-  <h3>Total Votes: <span id="totalVotes">0</span></h3>
-  <div id="voterList" style="white-space: pre-wrap; font-family: monospace;"></div>
-</div>
-
+    
 
 <script>
   function toggleOverlayVisibility() {
     socket.emit('togglePollVisibility');
   }
-  socket.on("voteUpdate", (votes) => {
+</script>
+
+
+    <div class="embed-info">
+      <p>🔗 Open <code>poll.html</code> in OBS as a browser source to show the live poll.</p>
+      <div id="voteStats" style="margin-top: 20px; text-align: left;">
+  <h3>Total Votes: <span id="totalVotes">0</span></h3>
+  <div id="voterList" style="white-space: pre-wrap; font-family: monospace;"></div>
+</div>
+
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    socket.on("voteUpdate", (votes) => {
   const totalVotesEl = document.getElementById("totalVotes");
   const voterListEl = document.getElementById("voterList");
 
@@ -96,17 +108,6 @@
   voterListEl.textContent = display;
 });
 
-</script>
-
-
-    <div class="embed-info">
-      <p>🔗 Open <code>poll.html</code> in OBS as a browser source to show the live poll.</p>
-    </div>
-  </div>
-
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
 
     function verifySecurityKey() {
       const securityKey = document.getElementById('securityKey').value;
