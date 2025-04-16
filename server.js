@@ -277,6 +277,10 @@ client.on("part", (channel, username_, self) => {
 client.on("join", (channel, username_, self) => {
   if (self) log(`Joined ${channel}`);
 });
+client.on("join", (channel, username, self) => {
+  if (username.toLowerCase() !== "prokameronbot") return;
+    client.say(channel, "ProKameron Bot (Twitch variant) has been activated in " + channel)
+});
 client.on("message", (channel, tags, message, self) => {
   //  if (!self) {
   log(`[${channel}] <${tags["display-name"] || tags.username}>: ${message}`);
