@@ -281,6 +281,38 @@ client.on("join", (channel, username, self) => {
   if (username.toLowerCase() !== "prokameronbot") return;
     client.say(channel, "ProKameron Bot (Twitch variant) has been activated in " + channel)
 });
+
+client.on("join", (channel, username, self) => {
+  // Ignore the bot itself
+  if (self) return;
+
+  // If botStartTime is not set, do nothing
+  if (!botStartTime) return;
+
+  const now = Date.now();
+  const uptimeMs = now - botStartTime;
+
+  // Only respond if bot has been active for more than 60 seconds
+  if (uptimeMs > 60000) {
+    client.say(channel, `Welcome in, ${username}!`);
+  }
+});
+
+client.on("part", (channel, username, self) => {
+  // Ignore the bot itself
+  if (self) return;
+
+  // If botStartTime is not set, do nothing
+  if (!botStartTime) return;
+
+  const now = Date.now();
+  const uptimeMs = now - botStartTime;
+
+  // Only respond if bot has been active for more than 60 seconds
+  if (uptimeMs > 60000) {
+    client.say(channel, `${username} has left...`);
+  }
+});
 client.on("message", (channel, tags, message, self) => {
   //  if (!self) {
   log(`[${channel}] <${tags["display-name"] || tags.username}>: ${message}`);
