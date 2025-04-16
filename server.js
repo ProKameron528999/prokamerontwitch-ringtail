@@ -332,7 +332,7 @@ client.on("message", (channel, tags, message, self) => {
 });
 
 client.on("clearchat", (channel) => {
-  client.say("The chat was cleared. Hi everyone!");
+  client.say(channel, "The chat was cleared. Hi everyone!");
 });
 
 let timeouts = {};
