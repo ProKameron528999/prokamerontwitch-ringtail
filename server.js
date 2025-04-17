@@ -541,7 +541,7 @@ client.on("message", async (channel, tags, message, self) => {
     tags["display-name"] === "ringbot216" ||
     tags["display-name"] === "ProKameron"
   ) {
-    /* if(message.includes("@prokameronbot has")) {
+     if(message.includes("@prokameronbot has")) {
       const match = message.match(/has (\d+) widgets/);
 
 const money = match ? parseInt(match[1], 10) : null;
