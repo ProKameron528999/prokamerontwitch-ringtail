@@ -1,4 +1,4 @@
-//process.exit();
+process.exit();
 const https = require("https");
 
 let botStartTime;
@@ -243,6 +243,71 @@ const client = new tmi.Client({
   channels: [channelName],
 });
 
+const farmer1 = new tmi.Client({
+  options: { debug: false },
+  identity: {
+    username: username,
+    password: process.env.MULTIMONSTER,
+  },
+  connection: {
+    secure: true,
+    reconnect: true,
+  },
+  channels: [channelName],
+});
+
+const farmer2 = new tmi.Client({
+  options: { debug: false },
+  identity: {
+    username: username,
+    password: process.env.HAPPYSCRIBBLE,
+  },
+  connection: {
+    secure: true,
+    reconnect: true,
+  },
+  channels: [channelName],
+});
+
+const farmer3 = new tmi.Client({
+  options: { debug: false },
+  identity: {
+    username: username,
+    password: process.env.A60PRIME,
+  },
+  connection: {
+    secure: true,
+    reconnect: true,
+  },
+  channels: [channelName],
+});
+
+const farmer4 = new tmi.Client({
+  options: { debug: false },
+  identity: {
+    username: username,
+    password: process.env.A90,
+  },
+  connection: {
+    secure: true,
+    reconnect: true,
+  },
+  channels: [channelName],
+});
+
+const farmer5 = new tmi.Client({
+  options: { debug: false },
+  identity: {
+    username: username,
+    password: process.env.AR0XMBUSH,
+  },
+  connection: {
+    secure: true,
+    reconnect: true,
+  },
+  channels: [channelName],
+});
+
 function log(message) {
   const now = new Date().toLocaleTimeString("en-US", { hour12: false });
   console.log(`[${now}] info: ${message}`);
@@ -282,7 +347,7 @@ client.on("join", (channel, username, self) => {
     client.say(channel, "ProKameron Bot (Twitch variant) has been activated in " + channel)
 });
 
-client.on("join", (channel, username, self) => {
+/*client.on("join", (channel, username, self) => {
   // Ignore the bot itself
   if (self) return;
 
@@ -312,7 +377,7 @@ client.on("part", (channel, username, self) => {
   if (uptimeMs > 60000) {
     client.say(channel, `${username} has left...`);
   }
-});
+});*/
 client.on("message", (channel, tags, message, self) => {
   //  if (!self) {
   log(`[${channel}] <${tags["display-name"] || tags.username}>: ${message}`);
