@@ -544,7 +544,7 @@ client.on("message", async (channel, tags, message, self) => {
      if(message.includes("@prokameronbot has")) {
       const match = message.match(/has (\d+) widgets/);
 
-const money = match ? parseInt(match[1], 10) : null;
+/*const money = match ? parseInt(match[1], 10) : null;
       client.say(channel, "!givepoints @prokameron " + money)
     }
     if(message.includes("pk!givememoney")) {
