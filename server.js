@@ -1,5 +1,7 @@
-process.exit();
+//process.exit();
 const https = require("https");
+
+let farmersenabled = false
 
 let botStartTime;
 
@@ -606,33 +608,73 @@ client.on("message", async (channel, tags, message, self) => {
     tags["display-name"] === "ringbot216" ||
     tags["display-name"] === "ProKameron"
   ) {
-     if(message.includes("@prokameronbot has")) {
+   /*  if(message.includes("@prokameronbot has")) {
       const match = message.match(/has (\d+) widgets/);
 
 const money = match ? parseInt(match[1], 10) : null;
       client.say(channel, "!givepoints @prokameron " + money)
+    }*/
+  /*  if (message.includes("@prokameronbot has")) {
+    const match = message.match(/has (\d+) widgets/);
+
+    const money = match ? parseInt(match[1], 10) : null;
+    client.say(channel, "!givepoints @prokameron " + money)
+}*/
+    if(farmersenabled) {
+if (message.includes("the_multi_monster has")) {
+    const match = message.match(/has (\d+) widgets/);
+
+    const money = match ? parseInt(match[1], 10) : null;
+    farmer1.say(channel, "!givepoints @prokameron " + money)
+}
+if (message.includes("the_happy_scribble has")) {
+    const match = message.match(/has (\d+) widgets/);
+
+    const money = match ? parseInt(match[1], 10) : null;
+    farmer2.say(channel, "!givepoints @prokameron " + money)
+}
+if (message.includes("a_60_prime has")) {
+    const match = message.match(/has (\d+) widgets/);
+
+    const money = match ? parseInt(match[1], 10) : null;
+    farmer3.say(channel, "!givepoints @prokameron " + money)
+}
+if (message.includes("a_90_paralysis has")) {
+    const match = message.match(/has (\d+) widgets/);
+
+    const money = match ? parseInt(match[1], 10) : null;
+    farmer4.say(channel, "!givepoints @prokameron " + money)
+}
+if (message.includes("ar0xmbush has")) {
+    const match = message.match(/has (\d+) widgets/);
+
+    const money = match ? parseInt(match[1], 10) : null;
+    farmer5.say(channel, "!givepoints @prokameron " + money)
+}
     }
-    if(message.includes("pk!givememoney")) {
-      client.say(channel, "!points")
-    }
-    if(message.includes("pk!dodaily")) {
+/*if (message.includes("pk!givememoney")) {
+    client.say(channel, "!points")
+}*/
+    if(farmersenabled) {
+if (message.includes("pk!dodaily")) {
     setTimeout(function() {
-      farmer1.say(channel, "!daily")
-}, 2000);
+        farmer1.say(channel, "!daily")
+    }, 0);
     setTimeout(function() {
-      farmer2.say(channel, "!daily")
-}, 2000);
+        farmer2.say(channel, "!daily")
+    }, 2000);
     setTimeout(function() {
 
-      farmer3.say(channel, "!daily")
+        farmer3.say(channel, "!daily")
 
-}, 2000);
+    }, 4000);
     setTimeout(function() {
-      farmer4.say(channel, "!daily")
-}, 2000);
+        farmer4.say(channel, "!daily")
+    }, 6000);
     setTimeout(function() {
-      farmer5.say(channel, "!daily")
-}, 2000);
+        farmer5.say(channel, "!daily")
+    }, 8000);
+}
     }
     if (message.includes("widgets to @prokameron")) {
       client.say(channel, "!points @prokameron");
@@ -832,6 +874,14 @@ client
   })
   .catch(console.error);
 userclient.connect().catch(console.error);
+
+
+farmer1.connect().catch(console.error);
+farmer2.connect().catch(console.error);
+farmer3.connect().catch(console.error);
+farmer4.connect().catch(console.error);
+farmer5.connect().catch(console.error);
+
 
 process.on("unhandledRejection", (reason, p) => {
   console.error(reason, p);
