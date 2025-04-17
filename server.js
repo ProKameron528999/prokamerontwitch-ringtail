@@ -606,7 +606,7 @@ client.on("message", async (channel, tags, message, self) => {
     tags["display-name"] === "ringbot216" ||
     tags["display-name"] === "ProKameron"
   ) {
-    /* if(message.includes("@prokameronbot has")) {
+     if(message.includes("@prokameronbot has")) {
       const match = message.match(/has (\d+) widgets/);
 
 const money = match ? parseInt(match[1], 10) : null;
@@ -616,8 +616,24 @@ const money = match ? parseInt(match[1], 10) : null;
       client.say(channel, "!points")
     }
     if(message.includes("pk!dodaily")) {
-      client.say(channel, "!daily")
-    }*/
+    setTimeout(function() {
+      farmer1.say(channel, "!daily")
+}, 2000);
+    setTimeout(function() {
+      farmer2.say(channel, "!daily")
+}, 2000);
+    setTimeout(function() {
+
+      farmer3.say(channel, "!daily")
+
+}, 2000);
+    setTimeout(function() {
+      farmer4.say(channel, "!daily")
+}, 2000);
+    setTimeout(function() {
+      farmer5.say(channel, "!daily")
+}, 2000);
+    }
     if (message.includes("widgets to @prokameron")) {
       client.say(channel, "!points @prokameron");
     }
