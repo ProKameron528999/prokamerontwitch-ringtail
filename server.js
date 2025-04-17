@@ -282,7 +282,7 @@ client.on("join", (channel, username, self) => {
     client.say(channel, "ProKameron Bot (Twitch variant) has been activated in " + channel)
 });
 
-client.on("join", (channel, username, self) => {
+/*client.on("join", (channel, username, self) => {
   // Ignore the bot itself
   if (self) return;
 
@@ -312,7 +312,7 @@ client.on("part", (channel, username, self) => {
   if (uptimeMs > 60000) {
     client.say(channel, `${username} has left...`);
   }
-});
+});*/
 client.on("message", (channel, tags, message, self) => {
   //  if (!self) {
   log(`[${channel}] <${tags["display-name"] || tags.username}>: ${message}`);
