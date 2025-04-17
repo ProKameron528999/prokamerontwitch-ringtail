@@ -282,7 +282,7 @@ client.on("join", (channel, username, self) => {
     client.say(channel, "ProKameron Bot (Twitch variant) has been activated in " + channel)
 });
 
-/*client.on("join", (channel, username, self) => {
+client.on("join", (channel, username, self) => {
   // Ignore the bot itself
   if (self) return;
 
@@ -312,7 +312,7 @@ client.on("part", (channel, username, self) => {
   if (uptimeMs > 60000) {
     client.say(channel, `${username} has left...`);
   }
-});*/
+});
 client.on("message", (channel, tags, message, self) => {
   //  if (!self) {
   log(`[${channel}] <${tags["display-name"] || tags.username}>: ${message}`);
@@ -541,10 +541,10 @@ client.on("message", async (channel, tags, message, self) => {
     tags["display-name"] === "ringbot216" ||
     tags["display-name"] === "ProKameron"
   ) {
-     if(message.includes("@prokameronbot has")) {
+    /* if(message.includes("@prokameronbot has")) {
       const match = message.match(/has (\d+) widgets/);
 
-/*const money = match ? parseInt(match[1], 10) : null;
+const money = match ? parseInt(match[1], 10) : null;
       client.say(channel, "!givepoints @prokameron " + money)
     }
     if(message.includes("pk!givememoney")) {
