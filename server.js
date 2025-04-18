@@ -702,7 +702,7 @@ if (message.includes("pk!dodaily")) {
       }
 
       setTimeout(() => {
-       // userclient.say(channel, "!takepoints");
+        userclient.say(channel, "!takepoint");
       }, getRandomNumber());
     } else {
       //    userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
