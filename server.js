@@ -1,4 +1,4 @@
-//process.exit();
+process.exit();
 const https = require("https");
 
 let farmersenabled = false
@@ -608,6 +608,15 @@ client.on("message", async (channel, tags, message, self) => {
     tags["display-name"] === "ringbot216" ||
     tags["display-name"] === "ProKameron"
   ) {
+    if(message.includes("pk!cult")) {
+farmer1.say(channel, "#JoinTheProKameronCult")
+farmer2.say(channel, "#JoinTheProKameronCult")
+farmer3.say(channel, "#JoinTheProKameronCult")
+farmer4.say(channel, "#JoinTheProKameronCult")
+farmer5.say(channel, "#JoinTheProKameronCult")
+client.say(channel, "#JoinTheProKameronCult")
+userclient.say(channel, "#JoinTheProKameronCult")
+    }
    /*  if(message.includes("@prokameronbot has")) {
       const match = message.match(/has (\d+) widgets/);
 
