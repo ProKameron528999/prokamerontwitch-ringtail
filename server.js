@@ -1,4 +1,4 @@
-process.exit();
+//process.exit();
 const https = require("https");
 
 let farmersenabled = false
