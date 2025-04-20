@@ -388,11 +388,11 @@ client.on("message", (channel, tags, message, self) => {
     lessStrictSlurs.some((word) => lessnormalizeText(message).includes(word));
   if (containsSlur) {
     sendWebhookMessage(
-      `[${channel}] <${tags["display-name"] || tags.username}>: [SLUR CENSORED]`
+      `**<${tags["display-name"] || tags.username}>**: [SLUR CENSORED]`
     );
   } else {
     sendWebhookMessage(
-      `[${channel}] <${tags["display-name"] || tags.username}>: ${message}`
+      `**<${tags["display-name"] || tags.username}>**: ${message}`
     );
     //    }
   }
