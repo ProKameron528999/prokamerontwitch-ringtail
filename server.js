@@ -1,6 +1,8 @@
 //process.exit();
 const https = require("https");
 
+let logMessages = true
+
 let farmersenabled = false
 
 let botStartTime;
@@ -35,8 +37,37 @@ function sendWebhook(message) {
   req.write(data);
   req.end();
 }
+function sendWebhookMessageAswell(message) {
+  const data = JSON.stringify({ content: message });
+
+  const url = new URL(process.env.WEBHOOK3);
+  const options = {
+    hostname: url.hostname,
+    path: url.pathname + url.search,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": data.length,
+    },
+  };
+  const req = https.request(options, (res) => {
+    if (res.statusCode === 204) {
+      //  console.log('Message sent successfully.');
+    } else {
+      console.error(`Failed to send message. Status code: ${res.statusCode}`);
+    }
+  });
+
+  req.on("error", (error) => {
+    console.error("Error sending message:", error);
+  });
+
+  req.write(data);
+  req.end();
+}
 
 function sendWebhookMessage(message) {
+if(!logMessages) return;
   const data = JSON.stringify({ content: message });
 
   const url = new URL(process.env.WEBHOOK2);
@@ -63,7 +94,9 @@ function sendWebhookMessage(message) {
 
   req.write(data);
   req.end();
+  sendWebhookMessageAswell(message)
 }
+
 
 function normalizeText(str) {
   // Define a mapping for numbers to letters
