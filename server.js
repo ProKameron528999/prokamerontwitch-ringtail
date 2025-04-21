@@ -3,7 +3,7 @@ const https = require("https");
 
 let logMessages = true
 
-let farmersenabled = false
+let entitiesenabled = false
 
 let botStartTime;
 
@@ -278,7 +278,7 @@ const client = new tmi.Client({
   channels: [channelName],
 });
 
-const farmer1 = new tmi.Client({
+const entity1 = new tmi.Client({
   options: { debug: false },
   identity: {
     username: username,
@@ -291,7 +291,7 @@ const farmer1 = new tmi.Client({
   channels: [channelName],
 });
 
-const farmer2 = new tmi.Client({
+const entity2 = new tmi.Client({
   options: { debug: false },
   identity: {
     username: username,
@@ -304,7 +304,7 @@ const farmer2 = new tmi.Client({
   channels: [channelName],
 });
 
-const farmer3 = new tmi.Client({
+const entity3 = new tmi.Client({
   options: { debug: false },
   identity: {
     username: username,
@@ -317,7 +317,7 @@ const farmer3 = new tmi.Client({
   channels: [channelName],
 });
 
-const farmer4 = new tmi.Client({
+const entity4 = new tmi.Client({
   options: { debug: false },
   identity: {
     username: username,
@@ -330,7 +330,7 @@ const farmer4 = new tmi.Client({
   channels: [channelName],
 });
 
-const farmer5 = new tmi.Client({
+const entity5 = new tmi.Client({
   options: { debug: false },
   identity: {
     username: username,
@@ -642,11 +642,11 @@ client.on("message", async (channel, tags, message, self) => {
     tags["display-name"] === "ProKameron"
   ) {
     if(message.includes("pk!cult")) {
-farmer1.say(channel, "#JoinTheProKameronCult")
-farmer2.say(channel, "#JoinTheProKameronCult")
-farmer3.say(channel, "#JoinTheProKameronCult")
-farmer4.say(channel, "#JoinTheProKameronCult")
-farmer5.say(channel, "#JoinTheProKameronCult")
+entity1.say(channel, "#JoinTheProKameronCult")
+entity2.say(channel, "#JoinTheProKameronCult")
+entity3.say(channel, "#JoinTheProKameronCult")
+entity4.say(channel, "#JoinTheProKameronCult")
+entity5.say(channel, "#JoinTheProKameronCult")
 client.say(channel, "#JoinTheProKameronCult")
 userclient.say(channel, "#JoinTheProKameronCult")
     }
@@ -662,59 +662,59 @@ const money = match ? parseInt(match[1], 10) : null;
     const money = match ? parseInt(match[1], 10) : null;
     client.say(channel, "!givepoints @prokameron " + money)
 }*/
-    if(farmersenabled) {
+    if(entitiesenabled) {
 if (message.includes("the_multi_monster has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    farmer1.say(channel, "!givepoints @prokameron " + money)
+    entity1.say(channel, "!givepoints @prokameron " + money)
 }
 if (message.includes("the_happy_scribble has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    farmer2.say(channel, "!givepoints @prokameron " + money)
+    entity2.say(channel, "!givepoints @prokameron " + money)
 }
 if (message.includes("a_60_prime has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    farmer3.say(channel, "!givepoints @prokameron " + money)
+    entity3.say(channel, "!givepoints @prokameron " + money)
 }
 if (message.includes("a_90_paralysis has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    farmer4.say(channel, "!givepoints @prokameron " + money)
+    entity4.say(channel, "!givepoints @prokameron " + money)
 }
 if (message.includes("ar0xmbush has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    farmer5.say(channel, "!givepoints @prokameron " + money)
+    entity5.say(channel, "!givepoints @prokameron " + money)
 }
     }
 /*if (message.includes("pk!givememoney")) {
     client.say(channel, "!points")
 }*/
-    if(farmersenabled) {
+    if(entitiesenabled) {
 if (message.includes("pk!dodaily")) {
     setTimeout(function() {
-        farmer1.say(channel, "!daily")
+        entity1.say(channel, "!daily")
     }, 0);
     setTimeout(function() {
-        farmer2.say(channel, "!daily")
+        entity2.say(channel, "!daily")
     }, 2000);
     setTimeout(function() {
 
-        farmer3.say(channel, "!daily")
+        entity3.say(channel, "!daily")
 
     }, 4000);
     setTimeout(function() {
-        farmer4.say(channel, "!daily")
+        entity4.say(channel, "!daily")
     }, 6000);
     setTimeout(function() {
-        farmer5.say(channel, "!daily")
+        entity5.say(channel, "!daily")
     }, 8000);
 }
     }
@@ -918,11 +918,11 @@ client
 userclient.connect().catch(console.error);
 
 
-farmer1.connect().catch(console.error);
-farmer2.connect().catch(console.error);
-farmer3.connect().catch(console.error);
-farmer4.connect().catch(console.error);
-farmer5.connect().catch(console.error);
+entity1.connect().catch(console.error);
+entity2.connect().catch(console.error);
+entity3.connect().catch(console.error);
+entity4.connect().catch(console.error);
+entity5.connect().catch(console.error);
 
 
 process.on("unhandledRejection", (reason, p) => {
