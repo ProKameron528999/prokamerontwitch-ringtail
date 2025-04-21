@@ -11,7 +11,7 @@ const { detect } = require("langdetect");
 const langs = require("langs");
 function sendWebhook(message) { 
   const data = JSON.stringify({ content: message });
-
+ 
   const url = new URL(process.env.WEBHOOK);
   const options = {
     hostname: url.hostname,
