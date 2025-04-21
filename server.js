@@ -882,13 +882,13 @@ io.on("connection", (socket) => {
         `WARNING! SOMEONE ENTERED A POTENTIAL SLUR INTO THE POLL SYSTEM! THE PASSWORD MAY HAVE BEEN LEAKED! @ringtail216 @prokameron`
       );
     } else {
-    /*  client.say(
+      client.say(
         "#ringtail216",
         "The poll has started! " +
           currentPoll.question +
           ' Vote in chat using "!vote <option number>" or just type the number. Options: ' +
           currentPoll.options.join(", ")
-      );*/
+      );
     }
     io.emit("pollStarted", currentPoll);
   });
