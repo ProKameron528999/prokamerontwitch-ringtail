@@ -268,8 +268,22 @@ const userclient = new tmi.Client({
 const client = new tmi.Client({
   options: { debug: false },
   identity: {
-    username: username,
-    password: oauthToken,
+    username: "ProKameronBot",
+    password: process.env.ACCESS_TOKE,
+  },
+  connection: {
+    secure: true,
+    reconnect: true,
+  },
+  channels: [channelName],
+});
+
+
+const aiclient = new tmi.Client({
+  options: { debug: false },
+  identity: {
+    username: "ProKameronAI",
+    password: process.env.AIACCOUNT,
   },
   connection: {
     secure: true,
@@ -281,7 +295,7 @@ const client = new tmi.Client({
 const entity1 = new tmi.Client({
   options: { debug: false },
   identity: {
-    username: username,
+    username: "The_Multi_Monster",
     password: process.env.MULTIMONSTER,
   },
   connection: {
@@ -294,7 +308,7 @@ const entity1 = new tmi.Client({
 const entity2 = new tmi.Client({
   options: { debug: false },
   identity: {
-    username: username,
+    username: "The_Happy_Scribble",
     password: process.env.HAPPYSCRIBBLE,
   },
   connection: {
@@ -307,7 +321,7 @@ const entity2 = new tmi.Client({
 const entity3 = new tmi.Client({
   options: { debug: false },
   identity: {
-    username: username,
+    username: "A_60_Prime",
     password: process.env.A60PRIME,
   },
   connection: {
@@ -320,7 +334,7 @@ const entity3 = new tmi.Client({
 const entity4 = new tmi.Client({
   options: { debug: false },
   identity: {
-    username: username,
+    username: "A_90_Paralysis",
     password: process.env.A90,
   },
   connection: {
@@ -333,7 +347,7 @@ const entity4 = new tmi.Client({
 const entity5 = new tmi.Client({
   options: { debug: false },
   identity: {
-    username: username,
+    username: "AR0xMBUSH",
     password: process.env.AR0XMBUSH,
   },
   connection: {
