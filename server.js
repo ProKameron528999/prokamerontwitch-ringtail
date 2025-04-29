@@ -441,7 +441,7 @@ client.on("part", (channel, username, self) => {
     client.say(channel, `${username} has left...`);
   }
 });*/
-client.on("message", (channel, tags, message, self) => {
+client.on("message",  (channel, tags, message, self) => {
   //  if (!self) {
   log(`[${channel}] <${tags["display-name"] || tags.username}>: ${message}`);
   const containsSlur =
@@ -497,6 +497,8 @@ client.on("message", async (channel, tags, message, self) => {
 
   // Auto-translate messages that aren't in English
   try {
+    
+    
     const detected = detect(message);
     const detectedLangCode = detected[0]?.lang || "unknown"; // Extract language code safely
     console.log(detectedLangCode);
