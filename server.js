@@ -1,11 +1,11 @@
-process.exit();
+//process.exit();
 
 const censorbot = require("./api/index.js");
 
 censorbot.authenticate(process.env.TOKEN);
 censorbot.setup("F0B-9H4f8Gsj3AS9owDhSFrhNAe7w4eo3nAGKfAHzWM", process.env.CHAT_ID_CENSOR, 482971041, "User");
 
-const characterAI = require("./api/index.js2");
+const characterAI = require("./api/index2.js");
 
 characterAI.authenticate(process.env.TOKEN);
 characterAI.setup("F0B-9H4f8Gsj3AS9owDhSFrhNAe7w4eo3nAGKfAHzWM", process.env.CHAT_ID, 482971041, "User");
@@ -497,7 +497,69 @@ client.on("message", async (channel, tags, message, self) => {
 
   // Auto-translate messages that aren't in English
   try {
-    
+    let sayCooldownUntil = 0; // global cooldown timestamp
+
+if (message.toLowerCase().includes("@prokameronai")) {
+  const now = Date.now();
+
+  if (now < sayCooldownUntil) {
+    client.say(channel, `${tags["display-name"]}, the AI is on cooldown. Please wait a bit.`);
+    return;
+  }
+
+  const msgToSay = message;
+
+  // Language detection and translation
+  let translated;
+  try {
+    const detected = detect(msgToSay);
+    const detectedLangCode = detected[0]?.lang || "unknown";
+    translated = await translate(msgToSay, { to: "en" });
+  } catch (error) {
+    console.error("Translation error:", error);
+    client.say(channel, "Something went wrong while translating your message for safety.");
+    return;
+  }
+
+  const containsSlur =
+    racialslur.some((word) => normalizeText(translated).includes(word)) ||
+    lessStrictSlurs.some((word) => lessnormalizeText(translated).includes(word));
+
+  if (containsSlur) {
+    client.say(channel, `${tags["display-name"]}, do not send the AI slurs. Request REJECTED. moron...`);
+    return;
+  }
+
+  if (msgToSay.trim().length === 0) {
+    client.say(channel, `${tags["display-name"]}, you need to provide a message to send to the AI.`);
+    return;
+  }
+
+  // Set global cooldown
+  sayCooldownUntil = now + 10 * 1000;
+
+  let aiResponse = await characterAI.send(
+    `You are an AI on Twitch, known as ProKameron AI, chatting on the Twitch Channel, ringtail216. Your Twitch handle is "prokameronai". You were created by ProKameron. You are female.\n\n${tags["display-name"] || tags.username} asks: ${msgToSay}\n\nPlease be sure to obey Twitch's TOS. Stay friendly. Reject inappropriate requests.`
+  );
+
+  const aiContainsSlur =
+    racialslur.some((word) => normalizeText(aiResponse).includes(word)) ||
+    lessStrictSlurs.some((word) => lessnormalizeText(aiResponse).includes(word));
+
+  if (aiContainsSlur) {
+    client.say(channel, `${tags["display-name"]}, Sorry, the AI generated a slur. For further use, try being more mindful of what you put.`);
+    return;
+  }
+
+  const censorbotcheck = await censorbot.send(`Scan this AI-generated message to make sure it obeys Twitch's TOS:\n\n"${aiResponse}"\n\nIf it's safe, reply with [SAFE]\nIf not, reply with [CENSOR]`);
+
+  if (censorbotcheck.includes("[SAFE]")) {
+    aiclient.say(channel, aiResponse);
+  } else {
+    client.say(channel, `${tags["display-name"]}, Sorry, the AI generated something that was against TOS, so the AI's response was rejected. For further use, try being more mindful of what you put.`);
+  }
+}
+
     
     const detected = detect(message);
     const detectedLangCode = detected[0]?.lang || "unknown"; // Extract language code safely
