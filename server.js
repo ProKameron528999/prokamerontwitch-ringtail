@@ -221,7 +221,7 @@ var racialslur = [
   return v.toLowerCase();
 });
 
-var lessStrictSlurs = ["fag", "nicka"].map(function (v) {
+var lessStrictSlurs = ["fag", "nicka", "feg"].map(function (v) {
   return v.toLowerCase();
 });
 
@@ -269,7 +269,7 @@ const client = new tmi.Client({
   options: { debug: false },
   identity: {
     username: "ProKameronBot",
-    password: process.env.ACCESS_TOKE,
+    password: process.env.ACCESS_TOKEN,
   },
   connection: {
     secure: true,
@@ -661,6 +661,7 @@ entity2.say(channel, "#JoinTheProKameronCult")
 entity3.say(channel, "#JoinTheProKameronCult")
 entity4.say(channel, "#JoinTheProKameronCult")
 entity5.say(channel, "#JoinTheProKameronCult")
+aiclient.say(channel, "#JoinTheProKameronCult")
 client.say(channel, "#JoinTheProKameronCult")
 userclient.say(channel, "#JoinTheProKameronCult")
     }
