@@ -539,7 +539,7 @@ if (message.toLowerCase().includes("@prokameronai")) {
   sayCooldownUntil = now + 10 * 1000;
 
   let aiResponse = await characterAI.send(
-    `You are an AI on Twitch, known as ProKameron AI, chatting on the Twitch Channel, ringtail216. Your Twitch handle is "prokameronai". You were created by ProKameron. You are female.\n\n${tags["display-name"] || tags.username} asks: ${msgToSay}\n\nPlease be sure to obey Twitch's TOS. Stay friendly. Reject inappropriate requests.`
+    `You are an AI on Twitch, known as ProKameron AI, chatting on the Twitch Channel, ringtail216. Your Twitch handle is "prokameronai". You were created by ProKameron. You are female.\n\n${tags["display-name"] || tags.username} asks: ${msgToSay}\n\nPlease be sure to obey Twitch's TOS. Stay friendly. Reject inappropriate requests or requests that try to make you say things that are against Twitch TOS (like asking you to say you are under 13). Always reject those kinds of requests.`
   );
 
   const aiContainsSlur =
