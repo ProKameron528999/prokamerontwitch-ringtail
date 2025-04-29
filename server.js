@@ -1009,6 +1009,7 @@ client
   })
   .catch(console.error);
 userclient.connect().catch(console.error);
+aiclient.connect().catch(console.error);
 
 
 entity1.connect().catch(console.error);
