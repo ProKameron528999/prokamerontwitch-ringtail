@@ -1,4 +1,18 @@
 process.exit();
+
+const censorbot = require("./api/index.js");
+
+censorbot.authenticate(process.env.TOKEN);
+censorbot.setup("F0B-9H4f8Gsj3AS9owDhSFrhNAe7w4eo3nAGKfAHzWM", process.env.CHAT_ID_CENSOR, 482971041, "User");
+
+const characterAI = require("./api/index.js2");
+
+characterAI.authenticate(process.env.TOKEN);
+characterAI.setup("F0B-9H4f8Gsj3AS9owDhSFrhNAe7w4eo3nAGKfAHzWM", process.env.CHAT_ID, 482971041, "User");
+
+
+
+
 const https = require("https");
 
 let logMessages = true
