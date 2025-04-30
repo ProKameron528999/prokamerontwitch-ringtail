@@ -498,7 +498,7 @@ client.on("message", async (channel, tags, message, self) => {
   // Auto-translate messages that aren't in English
   try {
     let sayCooldownUntil = 0; // global cooldown timestamp
-
+/*
 if (message.toLowerCase().includes("@prokameronai")) {
   const now = Date.now();
 
@@ -560,7 +560,7 @@ if (message.toLowerCase().includes("@prokameronai")) {
   }
 }
 
-    
+    */
     const detected = detect(message);
     const detectedLangCode = detected[0]?.lang || "unknown"; // Extract language code safely
     console.log(detectedLangCode);
