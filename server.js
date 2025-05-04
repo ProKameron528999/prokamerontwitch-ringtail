@@ -1,18 +1,4 @@
 //process.exit();
-
-const censorbot = require("./api/index.js");
-
-censorbot.authenticate(process.env.TOKEN);
-censorbot.setup("F0B-9H4f8Gsj3AS9owDhSFrhNAe7w4eo3nAGKfAHzWM", process.env.CHAT_ID_CENSOR, 482971041, "User");
-
-const characterAI = require("./api/index2.js");
-
-characterAI.authenticate(process.env.TOKEN);
-characterAI.setup("F0B-9H4f8Gsj3AS9owDhSFrhNAe7w4eo3nAGKfAHzWM", process.env.CHAT_ID, 482971041, "User");
-
-
-
-
 const https = require("https");
 
 let logMessages = true
@@ -235,7 +221,7 @@ var racialslur = [
   return v.toLowerCase();
 });
 
-var lessStrictSlurs = ["fag", "nicka", "feg"].map(function (v) {
+var lessStrictSlurs = ["fag", "nicka"].map(function (v) {
   return v.toLowerCase();
 });
 
@@ -268,10 +254,6 @@ const userclient = new tmi.Client({
     debug: false, // optional
     logger: silentLogger, // suppresses logs
   },
-  identity: {
-    username: "ProKameron",
-    password: process.env.ACCESS_TOKEN_OLD,
-  },
   connection: {
     secure: true,
     reconnect: true,
@@ -281,89 +263,6 @@ const userclient = new tmi.Client({
 
 const client = new tmi.Client({
   options: { debug: false },
-  identity: {
-    username: "ProKameronBot",
-    password: process.env.ACCESS_TOKEN,
-  },
-  connection: {
-    secure: true,
-    reconnect: true,
-  },
-  channels: [channelName],
-});
-
-
-const aiclient = new tmi.Client({
-  options: { debug: false },
-  identity: {
-    username: "ProKameronAI",
-    password: process.env.AIACCOUNT,
-  },
-  connection: {
-    secure: true,
-    reconnect: true,
-  },
-  channels: [channelName],
-});
-
-const entity1 = new tmi.Client({
-  options: { debug: false },
-  identity: {
-    username: "The_Multi_Monster",
-    password: process.env.MULTIMONSTER,
-  },
-  connection: {
-    secure: true,
-    reconnect: true,
-  },
-  channels: [channelName],
-});
-
-const entity2 = new tmi.Client({
-  options: { debug: false },
-  identity: {
-    username: "The_Happy_Scribble",
-    password: process.env.HAPPYSCRIBBLE,
-  },
-  connection: {
-    secure: true,
-    reconnect: true,
-  },
-  channels: [channelName],
-});
-
-const entity3 = new tmi.Client({
-  options: { debug: false },
-  identity: {
-    username: "A_60_Prime",
-    password: process.env.A60PRIME,
-  },
-  connection: {
-    secure: true,
-    reconnect: true,
-  },
-  channels: [channelName],
-});
-
-const entity4 = new tmi.Client({
-  options: { debug: false },
-  identity: {
-    username: "A_90_Paralysis",
-    password: process.env.A90,
-  },
-  connection: {
-    secure: true,
-    reconnect: true,
-  },
-  channels: [channelName],
-});
-
-const entity5 = new tmi.Client({
-  options: { debug: false },
-  identity: {
-    username: "AR0xMBUSH",
-    password: process.env.AR0XMBUSH,
-  },
   connection: {
     secure: true,
     reconnect: true,
@@ -407,7 +306,6 @@ client.on("join", (channel, username_, self) => {
 });
 client.on("join", (channel, username, self) => {
   if (username.toLowerCase() !== "prokameronbot") return;
-    client.say(channel, "ProKameron Bot (Twitch variant) has been activated in " + channel)
 });
 
 /*client.on("join", (channel, username, self) => {
@@ -422,7 +320,6 @@ client.on("join", (channel, username, self) => {
 
   // Only respond if bot has been active for more than 60 seconds
   if (uptimeMs > 60000) {
-    client.say(channel, `Welcome in, ${username}!`);
   }
 });
 
@@ -438,10 +335,9 @@ client.on("part", (channel, username, self) => {
 
   // Only respond if bot has been active for more than 60 seconds
   if (uptimeMs > 60000) {
-    client.say(channel, `${username} has left...`);
   }
 });*/
-client.on("message",  (channel, tags, message, self) => {
+client.on("message", (channel, tags, message, self) => {
   //  if (!self) {
   log(`[${channel}] <${tags["display-name"] || tags.username}>: ${message}`);
   const containsSlur =
@@ -460,7 +356,6 @@ client.on("message",  (channel, tags, message, self) => {
 });
 
 client.on("clearchat", (channel) => {
-  client.say(channel, "The chat was cleared. Hi everyone!");
 });
 
 let timeouts = {};
@@ -475,7 +370,6 @@ client.on("timeout", (channel, username, reason, duration, tags) => {
 
   setTimeout(() => {
     sendWebhook(`[Timeout tracker] ${username}'s timeout has expired.`);
-    client.say(channel, `[Timeout tracker] ${username}'s timeout has expired.`);
     delete timeouts[username];
   }, duration * 1000);
 });
@@ -485,7 +379,6 @@ client.on("ban", (channel, user, reason, bot) => {
 });
 
 client.on("raided", (channel, username, viewers) => {
-  client.say(channel, `Welcome in, all ${viewers} raiders from ${username}!`);
   sendWebhook(`Welcome in, all ${viewers} raiders from ${username}!`);
 });
 
@@ -497,70 +390,6 @@ client.on("message", async (channel, tags, message, self) => {
 
   // Auto-translate messages that aren't in English
   try {
-    let sayCooldownUntil = 0; // global cooldown timestamp
-/*
-if (message.toLowerCase().includes("@prokameronai")) {
-  const now = Date.now();
-
-  if (now < sayCooldownUntil) {
-    client.say(channel, `${tags["display-name"]}, the AI is on cooldown. Please wait a bit.`);
-    return;
-  }
-
-  const msgToSay = message;
-
-  // Language detection and translation
-  let translated;
-  try {
-    const detected = detect(msgToSay);
-    const detectedLangCode = detected[0]?.lang || "unknown";
-    translated = await translate(msgToSay, { to: "en" });
-  } catch (error) {
-    console.error("Translation error:", error);
-    client.say(channel, "Something went wrong while translating your message for safety.");
-    return;
-  }
-
-  const containsSlur =
-    racialslur.some((word) => normalizeText(translated).includes(word)) ||
-    lessStrictSlurs.some((word) => lessnormalizeText(translated).includes(word));
-
-  if (containsSlur) {
-    client.say(channel, `${tags["display-name"]}, do not send the AI slurs. Request REJECTED. moron...`);
-    return;
-  }
-
-  if (msgToSay.trim().length === 0) {
-    client.say(channel, `${tags["display-name"]}, you need to provide a message to send to the AI.`);
-    return;
-  }
-
-  // Set global cooldown
-  sayCooldownUntil = now + 10 * 1000;
-
-  let aiResponse = await characterAI.send(
-    `You are an AI on Twitch, known as ProKameron AI, chatting on the Twitch Channel, ringtail216. Your Twitch handle is "prokameronai". You were created by ProKameron. You are female.\n\n${tags["display-name"] || tags.username} asks: ${msgToSay}\n\nPlease be sure to obey Twitch's TOS. Stay friendly. Reject inappropriate requests or requests that try to make you say things that are against Twitch TOS (like asking you to say you are under 13). Always reject those kinds of requests.`
-  );
-
-  const aiContainsSlur =
-    racialslur.some((word) => normalizeText(aiResponse).includes(word)) ||
-    lessStrictSlurs.some((word) => lessnormalizeText(aiResponse).includes(word));
-
-  if (aiContainsSlur) {
-    client.say(channel, `${tags["display-name"]}, Sorry, the AI generated a slur. For further use, try being more mindful of what you put.`);
-    return;
-  }
-
-  const censorbotcheck = await censorbot.send(`Scan this AI-generated message to make sure it obeys Twitch's TOS:\n\n"${aiResponse}"\n\nIf it's safe, reply with [SAFE]\nIf not, reply with [CENSOR]`);
-
-  if (censorbotcheck.includes("[SAFE]")) {
-    aiclient.say(channel, aiResponse);
-  } else {
-    client.say(channel, `${tags["display-name"]}, Sorry, the AI generated something that was against TOS, so the AI's response was rejected. For further use, try being more mindful of what you put.`);
-  }
-}
-
-    */
     const detected = detect(message);
     const detectedLangCode = detected[0]?.lang || "unknown"; // Extract language code safely
     console.log(detectedLangCode);
@@ -593,19 +422,10 @@ if (message.toLowerCase().includes("@prokameronai")) {
           );
 
         if (containsSlur) {
-          client.say(
-            channel,
-            `${tags["display-name"]} tried to translate a SLUR! @ringtail216`
-          );
         } else {
-          client.say(
-            channel,
-            `${tags["display-name"]}, From ${detectedLangName}, the text you provided says "${translated}"`
-          );
         }
       } catch (error) {
         console.error("pk!translate error:", error);
-        client.say(channel, "Something went wrong while translating.");
       }
     }
 
@@ -646,10 +466,6 @@ if (message.toLowerCase().includes("@prokameronai")) {
             lessnormalizeText(message).includes(word)
           )
         ) {
-          client.say(
-            channel,
-            `${tags["display-name"]} said a slur in a different language. Please take action, @ringtail216`
-          );
         }
       }
     }
@@ -659,7 +475,6 @@ if (message.toLowerCase().includes("@prokameronai")) {
 
   if (message.toLowerCase().includes("pk!uptime")) {
     if (!botStartTime) {
-      client.say(channel, "Bot uptime not available yet.");
       return;
     }
 
@@ -671,7 +486,6 @@ if (message.toLowerCase().includes("@prokameronai")) {
     const hours = Math.floor(uptimeMs / (1000 * 60 * 60));
 
     const uptime = `${hours}h ${minutes}m ${seconds}s`;
-    client.say(channel, `Bot has been running for ${uptime}`);
   }
 
   if (message.startsWith("pk!translate ")) {
@@ -703,29 +517,20 @@ if (message.toLowerCase().includes("@prokameronai")) {
         );
 
       if (containsSlur) {
-        client.say(
-          channel,
-          `${tags["display-name"]} tried to translate a SLUR! @ringtail216`
-        );
+
       } else {
-        client.say(
-          channel,
-          `${tags["display-name"]}, From ${detectedLangName}, the text you provided says "${translated}"`
-        );
+
       }
     } catch (error) {
       console.error("pk!translate error:", error);
-      client.say(channel, "Something went wrong while translating.");
     }
   }
 
   if (message.startsWith("pk!randomnumber ")) {
     try {
       const number = message.replace("pk!randomnumber ", "").trim();
-      client.say(channel, "The random number is " + Math.floor(ran.random(number)))
     } catch (error) {
       console.error("pk!translate error:", error);
-      client.say(channel, "Something went wrong while generating a random number.");
     }
   }
   // Custom bot responses
@@ -734,85 +539,63 @@ if (message.toLowerCase().includes("@prokameronai")) {
     tags["display-name"] === "ProKameron"
   ) {
     if(message.includes("pk!cult")) {
-entity1.say(channel, "#JoinTheProKameronCult")
-entity2.say(channel, "#JoinTheProKameronCult")
-entity3.say(channel, "#JoinTheProKameronCult")
-entity4.say(channel, "#JoinTheProKameronCult")
-entity5.say(channel, "#JoinTheProKameronCult")
-aiclient.say(channel, "#JoinTheProKameronCult")
-client.say(channel, "#JoinTheProKameronCult")
-userclient.say(channel, "#JoinTheProKameronCult")
+
     }
    /*  if(message.includes("@prokameronbot has")) {
       const match = message.match(/has (\d+) widgets/);
 
 const money = match ? parseInt(match[1], 10) : null;
-      client.say(channel, "!givepoints @prokameron " + money)
     }*/
   /*  if (message.includes("@prokameronbot has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    client.say(channel, "!givepoints @prokameron " + money)
 }*/
     if(entitiesenabled) {
 if (message.includes("the_multi_monster has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    entity1.say(channel, "!givepoints @prokameron " + money)
 }
 if (message.includes("the_happy_scribble has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    entity2.say(channel, "!givepoints @prokameron " + money)
 }
 if (message.includes("a_60_prime has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    entity3.say(channel, "!givepoints @prokameron " + money)
 }
 if (message.includes("a_90_paralysis has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    entity4.say(channel, "!givepoints @prokameron " + money)
 }
 if (message.includes("ar0xmbush has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    entity5.say(channel, "!givepoints @prokameron " + money)
 }
     }
 /*if (message.includes("pk!givememoney")) {
-    client.say(channel, "!points")
 }*/
     if(entitiesenabled) {
 if (message.includes("pk!dodaily")) {
+    setTimeout(function() {    }, 0);
     setTimeout(function() {
-        entity1.say(channel, "!daily")
-    }, 0);
-    setTimeout(function() {
-        entity2.say(channel, "!daily")
     }, 2000);
     setTimeout(function() {
 
-        entity3.say(channel, "!daily")
 
     }, 4000);
     setTimeout(function() {
-        entity4.say(channel, "!daily")
     }, 6000);
     setTimeout(function() {
-        entity5.say(channel, "!daily")
     }, 8000);
 }
     }
     if (message.includes("widgets to @prokameron")) {
-      client.say(channel, "!points @prokameron");
     }
   }
   if (
@@ -828,14 +611,11 @@ if (message.includes("pk!dodaily")) {
       }
 
       setTimeout(() => {
-     //   userclient.say(channel, "!takepoint");
       }, getRandomNumber());
     } else {
-      //    userclient.say(channel, `dude I'm not stupid ${tags["display-name"]}`);
     }
   }
   if (racialslur.some((word) => normalizeText(message).includes(word))) {
-    client.say(channel, `${tags["display-name"]}, Slurs are not allowed!`);
   }
 
   if (
@@ -847,20 +627,12 @@ if (message.includes("pk!dodaily")) {
     if (tags["vip"]) status = "VIP";
     if (tags["user-type"] === "broadcaster") status = "Broadcaster";
 
-    client.say(
-      channel,
-      `You are ${tags["display-name"]}, a ${status} with the color ${tags["color"]}. Your user ID is ${tags["user-id"]}`
-    );
   }
 
   if (
     message.toLowerCase().includes("pk!coinflip") &&
     tags["display-name"] !== "jumbojosh2ndbiggestfan"
   ) {
-    client.say(
-      channel,
-      `${tags["display-name"]}, it's ${ran.choose(["Heads", "Tails"])}!`
-    );
   }
 
   if (
@@ -868,10 +640,6 @@ if (message.includes("pk!dodaily")) {
     message.toLowerCase().includes("!ban @prokameron")
   ) {
     let response = ran.chooseAngryResponse();
-    userclient.say(
-      channel,
-      `[AUTO-RESPONSE] ${response} ${tags["display-name"]} (response #${response.index})`
-    );
   }
 });
 
@@ -890,10 +658,6 @@ app.post("/verify-key", (req, res) => {
 
   if (key === process.env.SECRET) {
     res.json({ success: true });
-    client.say(
-      "#ringtail216",
-      "@ringtail216, a user just accessed the poll control panel. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password."
-    );
   } else {
     res.json({ success: false });
   }
@@ -951,7 +715,6 @@ client.on("message", (channel, tags, message, self) => {
     if (!targetUser || !currentPoll.votes[targetUser]) return;
 
     delete currentPoll.votes[targetUser];
-    client.say(channel, `${displayName} removed ${targetUser}'s vote.`);
     io.emit("voteUpdate", currentPoll.votes);
   }
 });
@@ -970,18 +733,8 @@ io.on("connection", (socket) => {
         normalizeText(currentPoll.options.join(", ")).includes(word)
       )
     ) {
-      client.say(
-        "#ringtail216",
-        `WARNING! SOMEONE ENTERED A POTENTIAL SLUR INTO THE POLL SYSTEM! THE PASSWORD MAY HAVE BEEN LEAKED! @ringtail216 @prokameron`
-      );
+
     } else {
-      client.say(
-        "#ringtail216",
-        "The poll has started! " +
-          currentPoll.question +
-          ' Vote in chat using "!vote <option number>" or just type the number. Options: ' +
-          currentPoll.options.join(", ")
-      );
     }
     io.emit("pollStarted", currentPoll);
   });
@@ -991,7 +744,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("endPoll", () => {
-    client.say("#ringtail216", "The poll has ended.");
     io.emit("pollEnded", currentPoll);
     currentPoll = null;
   });
@@ -1009,14 +761,7 @@ client
   })
   .catch(console.error);
 userclient.connect().catch(console.error);
-aiclient.connect().catch(console.error);
 
-
-entity1.connect().catch(console.error);
-entity2.connect().catch(console.error);
-entity3.connect().catch(console.error);
-entity4.connect().catch(console.error);
-entity5.connect().catch(console.error);
 
 
 process.on("unhandledRejection", (reason, p) => {
