@@ -293,7 +293,7 @@ const client = new tmi.Client({
 });
 
 
-const aiclient = new tmi.Client({
+/*const aiclient = new tmi.Client({
   options: { debug: false },
   identity: {
     username: "ProKameronAI",
@@ -369,7 +369,7 @@ const entity5 = new tmi.Client({
     reconnect: true,
   },
   channels: [channelName],
-});
+});*/
 
 function log(message) {
   const now = new Date().toLocaleTimeString("en-US", { hour12: false });
@@ -734,12 +734,12 @@ if (message.toLowerCase().includes("@prokameronai")) {
     tags["display-name"] === "ProKameron"
   ) {
     if(message.includes("pk!cult")) {
-entity1.say(channel, "#JoinTheProKameronCult")
-entity2.say(channel, "#JoinTheProKameronCult")
-entity3.say(channel, "#JoinTheProKameronCult")
-entity4.say(channel, "#JoinTheProKameronCult")
-entity5.say(channel, "#JoinTheProKameronCult")
-aiclient.say(channel, "#JoinTheProKameronCult")
+//entity1.say(channel, "#JoinTheProKameronCult")
+//entity2.say(channel, "#JoinTheProKameronCult")
+//entity3.say(channel, "#JoinTheProKameronCult")
+//entity4.say(channel, "#JoinTheProKameronCult")
+//entity5.say(channel, "#JoinTheProKameronCult")
+//aiclient.say(channel, "#JoinTheProKameronCult")
 client.say(channel, "#JoinTheProKameronCult")
 userclient.say(channel, "#JoinTheProKameronCult")
     }
@@ -760,31 +760,31 @@ if (message.includes("the_multi_monster has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    entity1.say(channel, "!givepoints @prokameron " + money)
+   // entity1.say(channel, "!givepoints @prokameron " + money)
 }
 if (message.includes("the_happy_scribble has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    entity2.say(channel, "!givepoints @prokameron " + money)
+   // entity2.say(channel, "!givepoints @prokameron " + money)
 }
 if (message.includes("a_60_prime has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    entity3.say(channel, "!givepoints @prokameron " + money)
+  //  entity3.say(channel, "!givepoints @prokameron " + money)
 }
 if (message.includes("a_90_paralysis has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    entity4.say(channel, "!givepoints @prokameron " + money)
+   // entity4.say(channel, "!givepoints @prokameron " + money)
 }
 if (message.includes("ar0xmbush has")) {
     const match = message.match(/has (\d+) widgets/);
 
     const money = match ? parseInt(match[1], 10) : null;
-    entity5.say(channel, "!givepoints @prokameron " + money)
+  //  entity5.say(channel, "!givepoints @prokameron " + money)
 }
     }
 /*if (message.includes("pk!givememoney")) {
@@ -793,21 +793,21 @@ if (message.includes("ar0xmbush has")) {
     if(entitiesenabled) {
 if (message.includes("pk!dodaily")) {
     setTimeout(function() {
-        entity1.say(channel, "!daily")
+   //     entity1.say(channel, "!daily")
     }, 0);
     setTimeout(function() {
-        entity2.say(channel, "!daily")
+   //     entity2.say(channel, "!daily")
     }, 2000);
     setTimeout(function() {
 
-        entity3.say(channel, "!daily")
+   //     entity3.say(channel, "!daily")
 
     }, 4000);
     setTimeout(function() {
-        entity4.say(channel, "!daily")
+   //     entity4.say(channel, "!daily")
     }, 6000);
     setTimeout(function() {
-        entity5.say(channel, "!daily")
+    //    entity5.say(channel, "!daily")
     }, 8000);
 }
     }
@@ -1009,14 +1009,14 @@ client
   })
   .catch(console.error);
 userclient.connect().catch(console.error);
-aiclient.connect().catch(console.error);
+//aiclient.connect().catch(console.error);
 
 
-entity1.connect().catch(console.error);
-entity2.connect().catch(console.error);
-entity3.connect().catch(console.error);
-entity4.connect().catch(console.error);
-entity5.connect().catch(console.error);
+//entity1.connect().catch(console.error);
+//entity2.connect().catch(console.error);
+//entity3.connect().catch(console.error);
+//entity4.connect().catch(console.error);
+//entity5.connect().catch(console.error);
 
 
 process.on("unhandledRejection", (reason, p) => {
