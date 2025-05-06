@@ -892,7 +892,7 @@ function endPoll() {
   if (currentPoll) {
     // Emit the "pollEnded" event to the clients
     io.emit("pollEnded", currentPoll);
-    client.say("#ringtail216", "The poll has ended.");
+    client.say("#ringtail216", "The poll has ran out of time.");
 
     // Reset the current poll
     currentPoll = null;
