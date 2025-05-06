@@ -1,4 +1,10 @@
-process.exit(); 
+//process.exit(); 
+const ran = require("./lib/random");
+
+    let stupidthing = ran.chooseAngryResponse();
+    console.log(
+      `[AUTO-RESPONSE] ${stupidthing} @user (response #${stupidthing.index})`
+    );
 
 const censorbot = require("./api/index.js");
 
@@ -239,7 +245,6 @@ var lessStrictSlurs = ["fag", "nicka", "feg"].map(function (v) {
   return v.toLowerCase();
 });
 
-const ran = require("./lib/random");
 const tmi = require("tmi.js");
 const http = require("http");
 
