@@ -1027,7 +1027,7 @@ io.on("connection", (socket) => {
     };
     console.log(currentPoll.question);
     console.log(currentPoll.options.join(", "));
-    
+   // console.log(poll.timer)
     if (poll.timer > 0) {
       // Set a timer to end the poll after the specified time
       pollTimer = setTimeout(() => {
@@ -1042,34 +1042,6 @@ io.on("connection", (socket) => {
     io.emit("togglePollVisibility");
   });
   
-  let pollEndTime = null;
-
-socket.on('pollStarted', (poll) => {
-  // Store the end time if a timer is set
-  if (poll.timer > 0) {
-    pollEndTime = Date.now() + poll.timer * 1000;
-    updateTimer();
-  } else {
-    document.getElementById('timer').textContent = '';
-  }
-});
-
-socket.on('pollEnded', () => {
-  document.getElementById('timer').textContent = 'Poll Ended';
-});
-
-function updateTimer() {
-  if (pollEndTime) {
-    const timeLeft = Math.max(0, pollEndTime - Date.now());
-    const secondsLeft = Math.floor(timeLeft / 1000);
-    document.getElementById('timer').textContent = `Time left: ${secondsLeft} seconds`;
-    
-    if (timeLeft > 0) {
-      setTimeout(updateTimer, 1000);
-    }
-  }
-}
-
 
   socket.on("endPoll", () => {
     clearTimeout(pollTimer); // Clear the timer if poll ends manually
