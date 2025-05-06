@@ -1020,7 +1020,7 @@ client.on("message", (channel, tags, message, self) => {
   const msg = message.trim();
 
   if (!wheelAccepting || wheelBlacklisted.has(username)) return;
-if(msg === "pk!testusers") {
+/*if(msg === "pk!testusers") {
       wheelEntries.push("testuser1");
       io.emit("wheelAdd", "testuser1");
       wheelEntries.push("testuser2");
@@ -1037,7 +1037,7 @@ if(msg === "pk!testusers") {
       io.emit("wheelAdd", "testuser7");
       wheelEntries.push("testuser8");
       io.emit("wheelAdd", "testuser8");
-}
+}*/
   if (msg === "1") {
     if (wheelEntries.includes(username)) {
       // Remove and punish
