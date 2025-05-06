@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wheel Spinner</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 2em;
+    }
+
+    canvas {
+      margin: 2em auto;
+      display: block;
+    }
+
+    #winner {
+      font-size: 2em;
+      margin-top: 1em;
+      color: #0f0;
+    }
+
+    button {
+      padding: 1em 2em;
+      font-size: 1.2em;
+      margin: 1em;
+      border: none;
+      border-radius: 10px;
+      background: #444;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>Wheel Spinner</h1>
+  <canvas id="wheel" width="400" height="400"></canvas>
+  <div id="winner"></div>
+  <button id="spinBtn">Spin the Wheel</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const spinBtn = document.getElementById("spinBtn");
+    const winnerDisplay = document.getElementById("winner");
+
+    let participants = [];
+    let punished = new Set();
+    let blacklisted = new Set();
+    let acceptingEntries = true;
+
+    function drawWheel() {
+      const radius = canvas.width / 2;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (participants.length === 0) return;
+
+      const angleStep = (2 * Math.PI) / participants.length;
+
+      participants.forEach((name, index) => {
+        const angle = angleStep * index;
+        ctx.beginPath();
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius, angle, angle + angleStep);
+        ctx.fillStyle = `hsl(${(index * 360) / participants.length}, 80%, 50%)`;
+        ctx.fill();
+        ctx.fillStyle = "#000";
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(angle + angleStep / 2);
+        ctx.textAlign = "right";
+        ctx.font = "16px sans-serif";
+        ctx.fillText(name, radius - 10, 5);
+        ctx.restore();
+      });
+    }
+
+    function spinWheel() {
+      if (participants.length === 0 || !acceptingEntries) return;
+
+      acceptingEntries = false;
+      const winnerIndex = Math.floor(Math.random() * participants.length);
+      const winner = participants[winnerIndex];
+      blacklisted.add(winner);
+      socket.emit("wheelWinner", winner);
+      winnerDisplay.textContent = `🎉 Winner: ${winner} 🎉`;
+
+      participants = [];
+      punished.clear();
+
+      drawWheel();
+    }
+
+    socket.on("wheelAdd", (name) => {
+      if (!acceptingEntries) return;
+
+      if (participants.includes(name)) {
+        participants = participants.filter((n) => n !== name);
+        punished.add(name);
+        socket.emit("wheelPunish", name);
+      } else if (!punished.has(name) && !blacklisted.has(name)) {
+        participants.push(name);
+        drawWheel();
+      }
+    });
+
+    socket.on("resetWheel", () => {
+      acceptingEntries = true;
+      blacklisted.clear();
+      winnerDisplay.textContent = "";
+      drawWheel();
+    });
+
+    spinBtn.addEventListener("click", spinWheel);
+  </script>
+</body>
+</html>

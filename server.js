@@ -997,6 +997,54 @@ io.on("connection", (socket) => {
   });
 });
 
+let wheelEntries = [];
+let wheelPunished = new Set();
+let wheelBlacklisted = new Set();
+let wheelAccepting = true;
+
+client.on("message", (channel, tags, message, self) => {
+  if (self) return;
+
+  const username = tags.username;
+  if (wheelBlacklisted.has(username)) return;
+  const msg = message.trim();
+
+  if (wheelAccepting && msg === "1") {
+    if (wheelEntries.includes(username)) {
+      // Duplicate entry = punishment
+      wheelEntries = wheelEntries.filter((n) => n !== username);
+      wheelPunished.add(username);
+      client.say(channel, `@${username}, you already typed 1, you moron! You know what, I'm removing you from the wheel.`);
+      io.emit("wheelAdd", username); // will cause removal and punishment on client
+    } else if (!wheelPunished.has(username)) {
+      wheelEntries.push(username);
+      io.emit("wheelAdd", username);
+    }
+  }
+});
+
+io.on("connection", (socket) => {
+  socket.on("wheelWinner", (winner) => {
+    client.say("#ringtail216", `🎉 The wheel winner is: ${winner} 🎉`);
+    wheelBlacklisted.clear();
+    wheelBlacklisted.add(winner);
+    wheelAccepting = false;
+  });
+
+  socket.on("wheelPunish", (name) => {
+    // Already handled in chat, optional logging
+  });
+
+  socket.on("resetWheel", () => {
+    wheelEntries = [];
+    wheelPunished.clear();
+    wheelBlacklisted.clear();
+    wheelAccepting = true;
+    io.emit("resetWheel");
+  });
+});
+
+
 server.listen(3000, () => {
   console.log("Server running at http://localhost:3000");
 });
