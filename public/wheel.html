@@ -13,10 +13,31 @@
       padding: 2em;
     }
 
-    canvas {
-      margin: 2em auto;
-      display: block;
+    #wheel-container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      margin: 0 auto;
     }
+
+    canvas {
+      display: block;
+      background: #222;
+      border-radius: 50%;
+    }
+
+#arrow {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 30px solid red; /* changed from border-bottom to border-top */
+  z-index: 10;
+}
 
     #winner {
       font-size: 2em;
@@ -42,7 +63,10 @@
 </head>
 <body>
   <h1>Wheel Spinner</h1>
-  <canvas id="wheel" width="400" height="400"></canvas>
+  <div id="wheel-container">
+    <div id="arrow"></div>
+    <canvas id="wheel" width="400" height="400"></canvas>
+  </div>
   <div id="winner"></div>
   <button id="spinBtn">Spin the Wheel</button>
 
@@ -59,7 +83,11 @@
     let blacklisted = new Set();
     let acceptingEntries = true;
 
-    function drawWheel() {
+    let angle = 0;
+    let spinning = false;
+    let winner = null;
+
+    function drawWheel(rotation = 0) {
       const radius = canvas.width / 2;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -68,17 +96,20 @@
       const angleStep = (2 * Math.PI) / participants.length;
 
       participants.forEach((name, index) => {
-        const angle = angleStep * index;
+        const startAngle = angleStep * index + rotation;
+        const endAngle = startAngle + angleStep;
+
         ctx.beginPath();
         ctx.moveTo(radius, radius);
-        ctx.arc(radius, radius, radius, angle, angle + angleStep);
+        ctx.arc(radius, radius, radius, startAngle, endAngle);
         ctx.fillStyle = `hsl(${(index * 360) / participants.length}, 80%, 50%)`;
         ctx.fill();
-        ctx.fillStyle = "#000";
+
         ctx.save();
         ctx.translate(radius, radius);
-        ctx.rotate(angle + angleStep / 2);
+        ctx.rotate(startAngle + angleStep / 2);
         ctx.textAlign = "right";
+        ctx.fillStyle = "#000";
         ctx.font = "16px sans-serif";
         ctx.fillText(name, radius - 10, 5);
         ctx.restore();
@@ -86,19 +117,44 @@
     }
 
     function spinWheel() {
-      if (participants.length === 0 || !acceptingEntries) return;
+      if (participants.length === 0 || !acceptingEntries || spinning) return;
 
       acceptingEntries = false;
+      spinning = true;
+
+      const anglePerSlice = (2 * Math.PI) / participants.length;
+
+      // Winner is at top (3/2 π angle), calculate winner index
       const winnerIndex = Math.floor(Math.random() * participants.length);
-      const winner = participants[winnerIndex];
-      blacklisted.add(winner);
-      socket.emit("wheelWinner", winner);
-      winnerDisplay.textContent = `🎉 Winner: ${winner} 🎉`;
+      winner = participants[winnerIndex];
+      const stopAngle = (Math.PI * 3 / 2) - (winnerIndex * anglePerSlice + anglePerSlice / 2);
+      const spins = 5;
+      const totalRotation = spins * 2 * Math.PI + stopAngle;
 
-      participants = [];
-      punished.clear();
+      let start = null;
+      const duration = 5000;
 
-      drawWheel();
+      function animate(timestamp) {
+        if (!start) start = timestamp;
+        const progress = Math.min((timestamp - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 4); // ease out
+
+        angle = eased * totalRotation;
+        drawWheel(angle);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          spinning = false;
+          blacklisted.add(winner);
+          winnerDisplay.textContent = `🎉 Winner: ${winner} 🎉`;
+          socket.emit("wheelWinner", winner);
+          participants = [];
+          punished.clear();
+        }
+      }
+
+      requestAnimationFrame(animate);
     }
 
     socket.on("wheelAdd", (name) => {
@@ -110,7 +166,7 @@
         socket.emit("wheelPunish", name);
       } else if (!punished.has(name) && !blacklisted.has(name)) {
         participants.push(name);
-        drawWheel();
+        drawWheel(angle);
       }
     });
 
@@ -118,7 +174,7 @@
       acceptingEntries = true;
       blacklisted.clear();
       winnerDisplay.textContent = "";
-      drawWheel();
+      drawWheel(0);
     });
 
     spinBtn.addEventListener("click", spinWheel);
