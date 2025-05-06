@@ -196,14 +196,16 @@ socket.on('pollStarted', (poll) => {
 });
 
 socket.on('pollEnded', () => {
-  document.getElementById('timer').textContent = 'Poll Ended';
+ // document.getElementById('timer').textContent = 'Poll Ended';
 });
   
   function updateTimer() {
   if (pollEndTime) {
     const timeLeft = Math.max(0, pollEndTime - Date.now());
     const secondsLeft = Math.floor(timeLeft / 1000);
-    document.getElementById('timer').textContent = `Time left: ${secondsLeft} seconds`;
+const minutes = Math.floor(secondsLeft / 60);
+const seconds = secondsLeft % 60;
+document.getElementById('timer').textContent = `Time left: ${minutes}:${seconds.toString().padStart(2, '0')}`;
     
     if (timeLeft > 0) {
       setTimeout(updateTimer, 1000);

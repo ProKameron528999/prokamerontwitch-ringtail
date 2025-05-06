@@ -1023,12 +1023,14 @@ io.on("connection", (socket) => {
     currentPoll = {
       question: poll.question,
       options: poll.options.map((opt) => opt),
+      timer: poll.timer || 0,
       votes: {},
     };
     console.log(currentPoll.question);
     console.log(currentPoll.options.join(", "));
-   // console.log(poll.timer)
+   // console.log(poll.timer) 
     if (poll.timer > 0) {
+    //  console.log(poll.timer)
       // Set a timer to end the poll after the specified time
       pollTimer = setTimeout(() => {
         endPoll();
