@@ -2,182 +2,192 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Wheel Spinner</title>
+  <title>Ringtail Wheel Control</title>
   <style>
     body {
+      font-family: 'Segoe UI', sans-serif;
       background: #111;
       color: #fff;
-      font-family: sans-serif;
+      padding: 30px;
       text-align: center;
-      padding-top: 30px;
-    }
-
-    #wheel-container {
-      position: relative;
-      width: 400px;
-      height: 400px;
-      margin: auto;
     }
 
     canvas {
+      margin: 20px auto;
       background: #222;
       border-radius: 50%;
+      display: block;
     }
 
-    #arrow {
-  position: absolute;
-  top: -30px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 15px solid transparent;
-  border-right: 15px solid transparent;
-  border-top: 30px solid red; /* changed from border-bottom to border-top */
-  z-index: 10;
-}
+    h1 {
+      color: #ffda44;
+    }
 
+    input, button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+    }
 
-    #winner {
-      font-size: 2em;
-      margin-top: 20px;
-      color: #0f0;
+    input {
+      background: #333;
+      color: white;
+      width: 300px;
     }
 
     button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 18px;
-      border-radius: 10px;
-      border: none;
-      background: #444;
-      color: white;
+      background: #ffda44;
+      color: black;
       cursor: pointer;
     }
 
     button:hover {
-      background: #666;
+      background: #f1c40f;
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h1>Wheel Spinner</h1>
-  <div id="wheel-container">
-    <div id="arrow"></div>
-    <canvas id="wheel" width="400" height="400"></canvas>
+  <h1>Ringtail Wheel Control</h1>
+
+  <!-- Security Prompt -->
+  <div id="securityPrompt">
+    <input id="securityKey" type="password" placeholder="Enter security key" /><br>
+    <button onclick="verifySecurityKey()">Submit</button>
   </div>
-  <div id="winner"></div>
-  <button id="spinBtn">🎯 Spin</button>
-  <button id="resetBtn">🔄 Reset</button>
+
+  <!-- Wheel Controls (Initially Hidden) -->
+  <div id="wheelControls" class="hidden">
+    <canvas id="wheelCanvas" width="500" height="500"></canvas>
+    <p id="winnerDisplay" style="font-size: 1.5em; margin-top: 10px;"></p>
+    <button onclick="spinWheel()">🎡 Spin</button>
+    <button onclick="resetWheel()">♻️ Reset</button>
+  </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
-    const canvas = document.getElementById("wheel");
-    const ctx = canvas.getContext("2d");
-    const spinBtn = document.getElementById("spinBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const winnerDisplay = document.getElementById("winner");
-
     let names = [];
-    let punished = new Set();
     let spinning = false;
-
-    function drawWheel(rotation = 0) {
-      const radius = canvas.width / 2;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (names.length === 0) return;
-
-      const angleStep = (2 * Math.PI) / names.length;
-
-      names.forEach((name, index) => {
-        const startAngle = angleStep * index + rotation;
-        const endAngle = startAngle + angleStep;
-
-        ctx.beginPath();
-        ctx.moveTo(radius, radius);
-        ctx.arc(radius, radius, radius, startAngle, endAngle);
-        ctx.fillStyle = `hsl(${(index * 360) / names.length}, 70%, 50%)`;
-        ctx.fill();
-
-        ctx.save();
-        ctx.translate(radius, radius);
-        ctx.rotate(startAngle + angleStep / 2);
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#000";
-        ctx.font = "14px sans-serif";
-        ctx.fillText(name, radius - 10, 5);
-        ctx.restore();
-      });
-    }
-
-function spinWheel() {
-  if (names.length === 0 || spinning) return;
-  spinning = true;
-  socket.emit("spinStart");
-
-  const anglePerSlice = (2 * Math.PI) / names.length;
-  const winnerIndex = Math.floor(Math.random() * names.length);
-  const winner = names[winnerIndex];
-
-  const stopAngle = (Math.PI * 3 / 2) - (winnerIndex * anglePerSlice + anglePerSlice / 2);
-
-  let angle = 0;
-  let speed = Math.random() * 0.2 + 0.25; // ⬅️ Slower start speed
-  const friction = 0.985; // ⬅️ Slower deceleration
-
-  function animate() {
-    angle += speed;
-    angle %= 2 * Math.PI;
-    speed *= friction;
-
-    drawWheel(angle);
-
-    if (speed > 0.0015) {
-      requestAnimationFrame(animate);
-    } else {
-      // Snap to winner
-      const finalAngle = stopAngle % (2 * Math.PI);
-      drawWheel(finalAngle);
-      spinning = false;
-      winnerDisplay.textContent = `🎉 Winner: ${winner}`;
-      socket.emit("spinEnd", winner);
-    }
-  }
-
-  requestAnimationFrame(animate);
-}
-
-
-
+    const canvas = document.getElementById("wheelCanvas");
+    const ctx = canvas.getContext("2d");
+    const winnerDisplay = document.getElementById("winnerDisplay");
 
     socket.on("wheelAdd", (name) => {
-      if (!names.includes(name) && !punished.has(name)) {
+      const index = names.indexOf(name);
+      if (index !== -1) {
+        names.splice(index, 1);
+        socket.emit("wheelPunish", name);
+      } else {
         names.push(name);
-        drawWheel();
       }
-    });
-
-    socket.on("wheelRemoveAndPunish", (name) => {
-      names = names.filter(n => n !== name);
-      punished.add(name);
-      drawWheel();
+      drawWheel(0);
     });
 
     socket.on("resetWheel", () => {
       names = [];
-      punished.clear();
       winnerDisplay.textContent = "";
-      drawWheel();
+      drawWheel(0);
     });
 
-    spinBtn.addEventListener("click", spinWheel);
-    resetBtn.addEventListener("click", () => {
+    function drawWheel(angle = 0) {
+      const radius = canvas.width / 2;
+      const anglePerSlice = (2 * Math.PI) / names.length;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw slices
+      for (let i = 0; i < names.length; i++) {
+        const start = angle + i * anglePerSlice;
+        const end = start + anglePerSlice;
+        ctx.beginPath();
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius, start, end);
+        ctx.fillStyle = `hsl(${(i * 360) / names.length}, 80%, 50%)`;
+        ctx.fill();
+        ctx.stroke();
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(start + anglePerSlice / 2);
+        ctx.fillStyle = "#000";
+        ctx.font = "16px sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(names[i], radius - 10, 5);
+        ctx.restore();
+      }
+
+      // Arrow
+      ctx.beginPath();
+      ctx.moveTo(radius, 5);
+      ctx.lineTo(radius - 15, 30);
+      ctx.lineTo(radius + 15, 30);
+      ctx.closePath();
+      ctx.fillStyle = "#fff";
+      ctx.fill();
+    }
+
+    function spinWheel() {
+      if (names.length === 0 || spinning) return;
+      spinning = true;
+      socket.emit("spinStart");
+
+      const anglePerSlice = (2 * Math.PI) / names.length;
+      let angle = 0;
+      let speed = Math.random() * 0.2 + 0.25;
+      const friction = 0.985;
+
+      function animate() {
+        angle += speed;
+        angle %= 2 * Math.PI;
+        speed *= friction;
+
+        drawWheel(angle);
+
+        if (speed > 0.0015) {
+          requestAnimationFrame(animate);
+        } else {
+          const pointerAngle = (Math.PI * 3 / 2 - angle + 2 * Math.PI) % (2 * Math.PI);
+          const winnerIndex = Math.floor(pointerAngle / anglePerSlice) % names.length;
+          const winner = names[winnerIndex];
+          drawWheel(angle);
+          winnerDisplay.textContent = `🎉 Winner: ${winner}`;
+          spinning = false;
+          socket.emit("spinEnd", winner);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function resetWheel() {
       socket.emit("resetWheel");
-    });
+    }
 
-    drawWheel();
+    function verifySecurityKey() {
+      const key = document.getElementById('securityKey').value;
+
+      fetch('/verify-wheel-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById("securityPrompt").style.display = "none";
+          document.getElementById("wheelControls").style.display = "block";
+        } else {
+          alert("Incorrect security key!");
+        }
+      });
+    }
+
+    drawWheel(0);
   </script>
 </body>
 </html>

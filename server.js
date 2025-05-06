@@ -899,6 +899,21 @@ app.post("/verify-key", (req, res) => {
   }
 });
 
+app.post("/verify-wheel-key", (req, res) => {
+  const { key } = req.body;
+
+  if (key === process.env.SECRET) {
+    res.json({ success: true });
+    client.say(
+      "#ringtail216",
+      "@ringtail216, a user just accessed the wheel spinner. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password."
+    );
+  } else {
+    res.json({ success: false });
+  }
+});
+
+
 client.on("message", (channel, tags, message, self) => {
   if (self) return;
 
