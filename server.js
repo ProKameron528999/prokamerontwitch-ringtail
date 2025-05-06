@@ -1006,24 +1006,28 @@ client.on("message", (channel, tags, message, self) => {
   if (self) return;
 
   const username = tags.username;
-  if (wheelBlacklisted.has(username)) return;
   const msg = message.trim();
 
-  if (wheelAccepting && msg === "1") {
+  if (!wheelAccepting || wheelBlacklisted.has(username)) return;
+
+  if (msg === "1") {
     if (wheelEntries.includes(username)) {
       // Duplicate entry = punishment
       wheelEntries = wheelEntries.filter((n) => n !== username);
       wheelPunished.add(username);
       client.say(channel, `@${username}, you already typed 1, you moron! You know what, I'm removing you from the wheel.`);
-      io.emit("wheelAdd", username); // will cause removal and punishment on client
+      io.emit("wheelAdd", username); // client removes & punishes
     } else if (!wheelPunished.has(username)) {
       wheelEntries.push(username);
-      io.emit("wheelAdd", username);
+      io.emit("wheelAdd", username); // client adds
     }
   }
 });
 
 io.on("connection", (socket) => {
+  // Optional: Sync current entries when a new admin connects
+  socket.emit("resetWheel"); // Clears the client, which redraws from server if needed
+
   socket.on("wheelWinner", (winner) => {
     client.say("#ringtail216", `🎉 The wheel winner is: ${winner} 🎉`);
     wheelBlacklisted.clear();
@@ -1032,7 +1036,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("wheelPunish", (name) => {
-    // Already handled in chat, optional logging
+    // Optional logging or moderation
   });
 
   socket.on("resetWheel", () => {
@@ -1043,6 +1047,7 @@ io.on("connection", (socket) => {
     io.emit("resetWheel");
   });
 });
+
 
 
 server.listen(3000, () => {

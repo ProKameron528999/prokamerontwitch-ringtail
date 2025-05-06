@@ -26,18 +26,18 @@
       border-radius: 50%;
     }
 
-#arrow {
-  position: absolute;
-  top: -30px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 15px solid transparent;
-  border-right: 15px solid transparent;
-  border-top: 30px solid red; /* changed from border-bottom to border-top */
-  z-index: 10;
-}
+    #arrow {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-top: 30px solid red;
+      z-index: 10;
+    }
 
     #winner {
       font-size: 2em;
@@ -68,7 +68,8 @@
     <canvas id="wheel" width="400" height="400"></canvas>
   </div>
   <div id="winner"></div>
-  <button id="spinBtn">Spin the Wheel</button>
+  <button id="spinBtn">🎯 Spin the Wheel</button>
+  <button id="resetBtn">🔄 Reset Wheel</button>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
@@ -76,6 +77,7 @@
     const canvas = document.getElementById("wheel");
     const ctx = canvas.getContext("2d");
     const spinBtn = document.getElementById("spinBtn");
+    const resetBtn = document.getElementById("resetBtn");
     const winnerDisplay = document.getElementById("winner");
 
     let participants = [];
@@ -123,13 +125,11 @@
       spinning = true;
 
       const anglePerSlice = (2 * Math.PI) / participants.length;
-
-      // Winner is at top (3/2 π angle), calculate winner index
       const winnerIndex = Math.floor(Math.random() * participants.length);
       winner = participants[winnerIndex];
+
       const stopAngle = (Math.PI * 3 / 2) - (winnerIndex * anglePerSlice + anglePerSlice / 2);
-      const spins = 5;
-      const totalRotation = spins * 2 * Math.PI + stopAngle;
+      const totalRotation = 5 * 2 * Math.PI + stopAngle;
 
       let start = null;
       const duration = 5000;
@@ -137,7 +137,7 @@
       function animate(timestamp) {
         if (!start) start = timestamp;
         const progress = Math.min((timestamp - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 4); // ease out
+        const eased = 1 - Math.pow(1 - progress, 4); // ease-out
 
         angle = eased * totalRotation;
         drawWheel(angle);
@@ -149,8 +149,6 @@
           blacklisted.add(winner);
           winnerDisplay.textContent = `🎉 Winner: ${winner} 🎉`;
           socket.emit("wheelWinner", winner);
-          participants = [];
-          punished.clear();
         }
       }
 
@@ -158,23 +156,25 @@
     }
 
     socket.on("wheelAdd", (name) => {
-      if (!acceptingEntries) return;
+      if (!acceptingEntries || blacklisted.has(name)) return;
 
       if (participants.includes(name)) {
         participants = participants.filter((n) => n !== name);
         punished.add(name);
         socket.emit("wheelPunish", name);
-      } else if (!punished.has(name) && !blacklisted.has(name)) {
+      } else if (!punished.has(name)) {
         participants.push(name);
         drawWheel(angle);
       }
     });
 
-    socket.on("resetWheel", () => {
+    resetBtn.addEventListener("click", () => {
       acceptingEntries = true;
+      punished.clear();
       blacklisted.clear();
       winnerDisplay.textContent = "";
       drawWheel(0);
+      socket.emit("resetWheel");
     });
 
     spinBtn.addEventListener("click", spinWheel);
