@@ -880,6 +880,24 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 let currentPoll = null;
+let pollTimer = null;
+
+function endPoll() {
+  // If there is an active poll, clear the timer and emit pollEnded event
+  if (pollTimer) {
+    clearTimeout(pollTimer);
+    pollTimer = null;
+  }
+  
+  if (currentPoll) {
+    // Emit the "pollEnded" event to the clients
+    io.emit("pollEnded", currentPoll);
+    client.say("#ringtail216", "The poll has ended.");
+
+    // Reset the current poll
+    currentPoll = null;
+  }
+}
 const blacklist = ["ringbot216"];
 
 app.use(express.json());
@@ -1023,6 +1041,35 @@ io.on("connection", (socket) => {
   socket.on("togglePollVisibility", () => {
     io.emit("togglePollVisibility");
   });
+  
+  let pollEndTime = null;
+
+socket.on('pollStarted', (poll) => {
+  // Store the end time if a timer is set
+  if (poll.timer > 0) {
+    pollEndTime = Date.now() + poll.timer * 1000;
+    updateTimer();
+  } else {
+    document.getElementById('timer').textContent = '';
+  }
+});
+
+socket.on('pollEnded', () => {
+  document.getElementById('timer').textContent = 'Poll Ended';
+});
+
+function updateTimer() {
+  if (pollEndTime) {
+    const timeLeft = Math.max(0, pollEndTime - Date.now());
+    const secondsLeft = Math.floor(timeLeft / 1000);
+    document.getElementById('timer').textContent = `Time left: ${secondsLeft} seconds`;
+    
+    if (timeLeft > 0) {
+      setTimeout(updateTimer, 1000);
+    }
+  }
+}
+
 
   socket.on("endPoll", () => {
     clearTimeout(pollTimer); // Clear the timer if poll ends manually
@@ -1031,6 +1078,7 @@ io.on("connection", (socket) => {
     io.emit("pollEnded", currentPoll);
     currentPoll = null;
   });
+})
 });
 let wheelEntries = [];
 let wheelPunished = new Set();
