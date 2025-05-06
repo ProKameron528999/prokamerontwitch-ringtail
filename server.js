@@ -1,4 +1,4 @@
-//process.exit(); 
+process.exit(); 
 
 const censorbot = require("./api/index.js");
 

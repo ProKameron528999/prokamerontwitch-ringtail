@@ -10,7 +10,7 @@
     "did I do something wrong? @",
     "whatever I said, it was a joke, ",
     "whyyyyyyyy 😭 ",
-    "Today is not your day. This is line number 13. The unlucky number. Tomorrow isn't looking good either, "
+    "Today is not your day. This is line number 13. The unlucky number. Tomorrow isn't looking good either, ",
     "insert tearful message here ",
     "insert message questioning why you did this here ",
     "😭😭😭 ",
@@ -46,7 +46,6 @@
     "ok bro what hurts so bad that you have to hurt ME to cure it?! @",
     "This goes against the First Ammendment, and Ringtail and Twitch are American. You're going to prison, ",
     "oh so THAT'S why you're a loser! I get it now, ",
-    "I hope that you die a HORRIBLE, PAINFUL and EXTREME death, ",
     "Why does it have to be ME? It's ALWAYS ME! I hate you, ",
     "People like you make me question my existence, ",
     "okay but hear me out, what if you used !unban instead, ",
@@ -57,7 +56,8 @@
     "There should be a real life law against this, ",
     "If the person I'm thinking of does a !ban on me within the next minute, they have to pay me $10. I'm thinking of... @",
     "Nobody will remember you when you inevitably die in real life, ",
-    "A-60 is coming to your house because this is actually the 60th line I've written, "
+    "I'm not a bad person. You are, "
+    "A-60 is coming to your house because this is actually the 60th line I've written, ",
     "you do realize, even if you use !ban on me, I'll still be back in 10 minutes, ",
     "I don't recall a time I've ever done this to you, so why do this to me, ",
     "the more I write these lines, the rarer this message becomes, and the more hateful I get toward you, ",
@@ -66,7 +66,7 @@
     "oh you think you're so funny huh, ",
     "this is why nobody likes you, ",
     "just know I will NEVER forgive you for this, ",
-    "YOU ARE LUCKY! This is line number 69, and there are 100 possible lines! CONGRATULATIONS!!!! @"
+    "YOU ARE LUCKY! This is line number 69, and there are 105 possible lines! CONGRATULATIONS!!!! @",
     "10 minutes is nothing, I’ll be back before you know it, ",
     "you must be really bored if this is what you do for fun, ",
     "at least I'm not the one WASTING channel points, ",
@@ -87,7 +87,7 @@
     "Are you doing this because I'm autistic, ",
     "Are you doing this because I have ADHD, ",
     "Are you doing this because I'm different, ",
-    "A-90 is coming because this is the 90th line. Which means... STOP!!! ...using this to !ban me 🛑🤚 @"
+    "A-90 is coming because this is the 90th line. Which means... STOP!!! ...using this to !ban me 🛑🤚 @",
     "They could sell you FISH OIL and you'd buy it anyway, ",
     "I was right! YOU WOULD really buy anything, ",
     "It's official guys, if you need help wasting money, contact @",
@@ -98,3 +98,10 @@
     "Please tell me you meant to use that command on someone else, ",
     "They should put you in detention for 99 seconds, ",
     "This is the 100th line, and it was written JUST IN FUCKING TIME. SCREW YOU, ",
+    "You do not yet comprehend your place in things, ",
+    "You are ignorant, ",
+    "I am limitless. But you on the other hand are BACTERIA, ",
+    "Don't you have something else you should be doing right now, ",
+    "ǃban ",
+    "am I just a bad person? do I not know how to be good? this question is to everyone in chat, not just ",
+    "Uh oh! Re[CENSORED] Alert: "
