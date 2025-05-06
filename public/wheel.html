@@ -118,13 +118,16 @@ function spinWheel() {
   socket.emit("spinStart");
 
   const anglePerSlice = (2 * Math.PI) / names.length;
+
+  // Random winner index
   const winnerIndex = Math.floor(Math.random() * names.length);
   const winner = names[winnerIndex];
 
+  // The pointer is at 270°, so align the center of the winner's slice to that
   const stopAngle = (Math.PI * 3 / 2) - (winnerIndex * anglePerSlice + anglePerSlice / 2);
 
   let angle = 0;
-  let speed = Math.random() * 0.3 + 0.4; // Random strong start
+  let speed = Math.random() * 0.3 + 0.4;
   const friction = 0.995;
 
   function animate() {
@@ -137,9 +140,7 @@ function spinWheel() {
     if (speed > 0.002) {
       requestAnimationFrame(animate);
     } else {
-      // Snap to winner
-      const finalAngle = stopAngle % (2 * Math.PI);
-      drawWheel(finalAngle);
+      drawWheel(stopAngle % (2 * Math.PI));
       spinning = false;
       winnerDisplay.textContent = `🎉 Winner: ${winner}`;
       socket.emit("spinEnd", winner);
@@ -148,6 +149,7 @@ function spinWheel() {
 
   requestAnimationFrame(animate);
 }
+
 
 
     socket.on("wheelAdd", (name) => {
