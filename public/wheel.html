@@ -143,39 +143,41 @@
       });
     }
 
-    function spinWheel() {
-      if (names.length === 0 || spinning) return;
-      spinning = true;
-      socket.emit("spinStart");
+function spinWheel() {
+  if (names.length === 0 || spinning) return;
+  spinning = true;
+  socket.emit("spinStart");
 
-      const anglePerSlice = (2 * Math.PI) / names.length;
-      let angle = 0;
-      let speed = Math.random() * 0.2 + 0.25;
-      const friction = 0.985;
+  const anglePerSlice = (2 * Math.PI) / names.length;
+  let angle = 0;
+  let speed = Math.random() * 0.1 + 0.15;  // Slower spin speed
+  const friction = 0.997;  // Slower deceleration
 
-      function animate() {
-        angle += speed;
-        angle %= 2 * Math.PI;
-        speed *= friction;
+  function animate() {
+    angle += speed;
+    angle %= 2 * Math.PI;
+    speed *= friction;
 
-        drawWheel(angle);
+    drawWheel(angle);
 
-        if (speed > 0.0015) {
-          requestAnimationFrame(animate);
-        } else {
-          const pointerAngle = (Math.PI * 3 / 2 - angle + 2 * Math.PI) % (2 * Math.PI);
-          const winnerIndex = Math.floor(pointerAngle / anglePerSlice) % names.length;
-          const winner = names[winnerIndex];
-
-          drawWheel(angle);
-          spinning = false;
-          winnerDisplay.textContent = `🎉 Winner: ${winner}`;
-          socket.emit("spinEnd", winner);
-        }
-      }
-
+    if (speed > 0.0015) {
       requestAnimationFrame(animate);
+    } else {
+      const pointerAngle = (Math.PI * 3 / 2 - angle + 2 * Math.PI) % (2 * Math.PI);
+      const winnerIndex = Math.floor(pointerAngle / anglePerSlice) % names.length;
+      const winner = names[winnerIndex];
+
+      drawWheel(angle);
+      spinning = false;
+      winnerDisplay.textContent = `🎉 Winner: ${winner}`;
+      socket.emit("spinEnd", winner);
     }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+
 
     socket.on("wheelAdd", (name) => {
       if (!names.includes(name) && !punished.has(name)) {

@@ -904,14 +904,11 @@ app.post("/verify-wheel-key", (req, res) => {
 
   if (key === process.env.SECRET) {
     res.json({ success: true });
-    client.say(
-      "#ringtail216",
-      "@ringtail216, a user just accessed the wheel spinner. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password."
-    );
+    client.say(  "#ringtail216",  "@ringtail216, a user just accessed the wheel spinner. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password.");
   } else {
     res.json({ success: false });
   }
-});
+}); 
 
 
 client.on("message", (channel, tags, message, self) => {
@@ -1041,7 +1038,7 @@ if(msg === "pk!testusers") {
       wheelEntries.push("testuser8");
       io.emit("wheelAdd", "testuser8");
 }
-  if (msg === "2") {
+  if (msg === "1") {
     if (wheelEntries.includes(username)) {
       // Remove and punish
       wheelEntries = wheelEntries.filter(n => n !== username);
