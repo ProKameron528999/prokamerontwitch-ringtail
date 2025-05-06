@@ -112,40 +112,43 @@
       });
     }
 
-    function spinWheel() {
-      if (names.length === 0 || spinning) return;
-      spinning = true;
-      socket.emit("spinStart");
+function spinWheel() {
+  if (names.length === 0 || spinning) return;
+  spinning = true;
+  socket.emit("spinStart");
 
-      const anglePerSlice = (2 * Math.PI) / names.length;
-      const winnerIndex = Math.floor(Math.random() * names.length);
-      const winner = names[winnerIndex];
+  const anglePerSlice = (2 * Math.PI) / names.length;
+  const winnerIndex = Math.floor(Math.random() * names.length);
+  const winner = names[winnerIndex];
 
-      const stopAngle = (Math.PI * 3 / 2) - (winnerIndex * anglePerSlice + anglePerSlice / 2);
-      const totalRotation = 6 * 2 * Math.PI + stopAngle;
+  const stopAngle = (Math.PI * 3 / 2) - (winnerIndex * anglePerSlice + anglePerSlice / 2);
 
-      let start = null;
-      const duration = 5000;
+  let angle = 0;
+  let speed = Math.random() * 0.3 + 0.4; // Random strong start
+  const friction = 0.995;
 
-      function animate(timestamp) {
-        if (!start) start = timestamp;
-        const progress = Math.min((timestamp - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 4);
-        const angle = eased * totalRotation;
+  function animate() {
+    angle += speed;
+    angle %= 2 * Math.PI;
+    speed *= friction;
 
-        drawWheel(angle);
+    drawWheel(angle);
 
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          spinning = false;
-          winnerDisplay.textContent = `🎉 Winner: ${winner}`;
-          socket.emit("spinEnd", winner);
-        }
-      }
-
+    if (speed > 0.002) {
       requestAnimationFrame(animate);
+    } else {
+      // Snap to winner
+      const finalAngle = stopAngle % (2 * Math.PI);
+      drawWheel(finalAngle);
+      spinning = false;
+      winnerDisplay.textContent = `🎉 Winner: ${winner}`;
+      socket.emit("spinEnd", winner);
     }
+  }
+
+  requestAnimationFrame(animate);
+}
+
 
     socket.on("wheelAdd", (name) => {
       if (!names.includes(name) && !punished.has(name)) {

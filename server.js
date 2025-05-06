@@ -1008,7 +1008,24 @@ client.on("message", (channel, tags, message, self) => {
   const msg = message.trim();
 
   if (!wheelAccepting || wheelBlacklisted.has(username)) return;
-
+if(msg === "pk!testusers") {
+      wheelEntries.push("testuser1");
+      io.emit("wheelAdd", "testuser1");
+      wheelEntries.push("testuser2");
+      io.emit("wheelAdd", "testuser2");
+      wheelEntries.push("testuser3");
+      io.emit("wheelAdd", "testuser3");
+      wheelEntries.push("testuser4");
+      io.emit("wheelAdd", "testuser4");
+      wheelEntries.push("testuser5");
+      io.emit("wheelAdd", "testuser5");
+      wheelEntries.push("testuser6");
+      io.emit("wheelAdd", "testuser6");
+      wheelEntries.push("testuser7");
+      io.emit("wheelAdd", "testuser7");
+      wheelEntries.push("testuser8");
+      io.emit("wheelAdd", "testuser8");
+}
   if (msg === "2") {
     if (wheelEntries.includes(username)) {
       // Remove and punish
@@ -1033,6 +1050,7 @@ io.on("connection", (socket) => {
 
   socket.on("spinEnd", (winner) => {
     client.say("#ringtail216", `🎉 The wheel winner is: ${winner} 🎉`);
+        wheelBlacklisted.clear();
     wheelBlacklisted.add(winner);
           io.emit("wheelRemoveAndPunish", winner);
 
