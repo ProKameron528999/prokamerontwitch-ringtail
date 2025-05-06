@@ -2,57 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Wheel Spinner</title>
   <style>
     body {
-      font-family: sans-serif;
       background: #111;
       color: #fff;
+      font-family: sans-serif;
       text-align: center;
-      padding: 2em;
+      padding-top: 30px;
     }
 
     #wheel-container {
       position: relative;
       width: 400px;
       height: 400px;
-      margin: 0 auto;
+      margin: auto;
     }
 
     canvas {
-      display: block;
       background: #222;
       border-radius: 50%;
     }
 
     #arrow {
-      position: absolute;
-      top: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-top: 30px solid red;
-      z-index: 10;
-    }
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 30px solid red; /* changed from border-bottom to border-top */
+  z-index: 10;
+}
+
 
     #winner {
       font-size: 2em;
-      margin-top: 1em;
+      margin-top: 20px;
       color: #0f0;
     }
 
     button {
-      padding: 1em 2em;
-      font-size: 1.2em;
-      margin: 1em;
-      border: none;
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
       border-radius: 10px;
+      border: none;
       background: #444;
-      color: #fff;
+      color: white;
       cursor: pointer;
     }
 
@@ -68,8 +67,8 @@
     <canvas id="wheel" width="400" height="400"></canvas>
   </div>
   <div id="winner"></div>
-  <button id="spinBtn">🎯 Spin the Wheel</button>
-  <button id="resetBtn">🔄 Reset Wheel</button>
+  <button id="spinBtn">🎯 Spin</button>
+  <button id="resetBtn">🔄 Reset</button>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
@@ -80,31 +79,26 @@
     const resetBtn = document.getElementById("resetBtn");
     const winnerDisplay = document.getElementById("winner");
 
-    let participants = [];
+    let names = [];
     let punished = new Set();
-    let blacklisted = new Set();
-    let acceptingEntries = true;
-
-    let angle = 0;
     let spinning = false;
-    let winner = null;
 
     function drawWheel(rotation = 0) {
       const radius = canvas.width / 2;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (participants.length === 0) return;
+      if (names.length === 0) return;
 
-      const angleStep = (2 * Math.PI) / participants.length;
+      const angleStep = (2 * Math.PI) / names.length;
 
-      participants.forEach((name, index) => {
+      names.forEach((name, index) => {
         const startAngle = angleStep * index + rotation;
         const endAngle = startAngle + angleStep;
 
         ctx.beginPath();
         ctx.moveTo(radius, radius);
         ctx.arc(radius, radius, radius, startAngle, endAngle);
-        ctx.fillStyle = `hsl(${(index * 360) / participants.length}, 80%, 50%)`;
+        ctx.fillStyle = `hsl(${(index * 360) / names.length}, 70%, 50%)`;
         ctx.fill();
 
         ctx.save();
@@ -112,24 +106,23 @@
         ctx.rotate(startAngle + angleStep / 2);
         ctx.textAlign = "right";
         ctx.fillStyle = "#000";
-        ctx.font = "16px sans-serif";
+        ctx.font = "14px sans-serif";
         ctx.fillText(name, radius - 10, 5);
         ctx.restore();
       });
     }
 
     function spinWheel() {
-      if (participants.length === 0 || !acceptingEntries || spinning) return;
-
-      acceptingEntries = false;
+      if (names.length === 0 || spinning) return;
       spinning = true;
+      socket.emit("spinStart");
 
-      const anglePerSlice = (2 * Math.PI) / participants.length;
-      const winnerIndex = Math.floor(Math.random() * participants.length);
-      winner = participants[winnerIndex];
+      const anglePerSlice = (2 * Math.PI) / names.length;
+      const winnerIndex = Math.floor(Math.random() * names.length);
+      const winner = names[winnerIndex];
 
       const stopAngle = (Math.PI * 3 / 2) - (winnerIndex * anglePerSlice + anglePerSlice / 2);
-      const totalRotation = 5 * 2 * Math.PI + stopAngle;
+      const totalRotation = 6 * 2 * Math.PI + stopAngle;
 
       let start = null;
       const duration = 5000;
@@ -137,18 +130,17 @@
       function animate(timestamp) {
         if (!start) start = timestamp;
         const progress = Math.min((timestamp - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 4); // ease-out
+        const eased = 1 - Math.pow(1 - progress, 4);
+        const angle = eased * totalRotation;
 
-        angle = eased * totalRotation;
         drawWheel(angle);
 
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
           spinning = false;
-          blacklisted.add(winner);
-          winnerDisplay.textContent = `🎉 Winner: ${winner} 🎉`;
-          socket.emit("wheelWinner", winner);
+          winnerDisplay.textContent = `🎉 Winner: ${winner}`;
+          socket.emit("spinEnd", winner);
         }
       }
 
@@ -156,28 +148,31 @@
     }
 
     socket.on("wheelAdd", (name) => {
-      if (!acceptingEntries || blacklisted.has(name)) return;
-
-      if (participants.includes(name)) {
-        participants = participants.filter((n) => n !== name);
-        punished.add(name);
-        socket.emit("wheelPunish", name);
-      } else if (!punished.has(name)) {
-        participants.push(name);
-        drawWheel(angle);
+      if (!names.includes(name) && !punished.has(name)) {
+        names.push(name);
+        drawWheel();
       }
     });
 
-    resetBtn.addEventListener("click", () => {
-      acceptingEntries = true;
+    socket.on("wheelRemoveAndPunish", (name) => {
+      names = names.filter(n => n !== name);
+      punished.add(name);
+      drawWheel();
+    });
+
+    socket.on("resetWheel", () => {
+      names = [];
       punished.clear();
-      blacklisted.clear();
       winnerDisplay.textContent = "";
-      drawWheel(0);
-      socket.emit("resetWheel");
+      drawWheel();
     });
 
     spinBtn.addEventListener("click", spinWheel);
+    resetBtn.addEventListener("click", () => {
+      socket.emit("resetWheel");
+    });
+
+    drawWheel();
   </script>
 </body>
 </html>

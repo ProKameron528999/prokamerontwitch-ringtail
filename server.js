@@ -996,7 +996,6 @@ io.on("connection", (socket) => {
     currentPoll = null;
   });
 });
-
 let wheelEntries = [];
 let wheelPunished = new Set();
 let wheelBlacklisted = new Set();
@@ -1010,33 +1009,35 @@ client.on("message", (channel, tags, message, self) => {
 
   if (!wheelAccepting || wheelBlacklisted.has(username)) return;
 
-  if (msg === "1") {
+  if (msg === "2") {
     if (wheelEntries.includes(username)) {
-      // Duplicate entry = punishment
-      wheelEntries = wheelEntries.filter((n) => n !== username);
+      // Remove and punish
+      wheelEntries = wheelEntries.filter(n => n !== username);
       wheelPunished.add(username);
-      client.say(channel, `@${username}, you already typed 1, you moron! You know what, I'm removing you from the wheel.`);
-      io.emit("wheelAdd", username); // client removes & punishes
+      client.say(channel, `@${username}, you already typed 1, moron! You know what, I'm removing you from the wheel. Don't do that again.`);
+      io.emit("wheelRemoveAndPunish", username);
     } else if (!wheelPunished.has(username)) {
       wheelEntries.push(username);
-      io.emit("wheelAdd", username); // client adds
+      io.emit("wheelAdd", username);
     }
   }
 });
 
 io.on("connection", (socket) => {
-  // Optional: Sync current entries when a new admin connects
-  socket.emit("resetWheel"); // Clears the client, which redraws from server if needed
+  // Send existing entries if needed
+  wheelEntries.forEach(name => socket.emit("wheelAdd", name));
 
-  socket.on("wheelWinner", (winner) => {
-    client.say("#ringtail216", `🎉 The wheel winner is: ${winner} 🎉`);
-    wheelBlacklisted.clear();
-    wheelBlacklisted.add(winner);
+  socket.on("spinStart", () => {
     wheelAccepting = false;
   });
 
-  socket.on("wheelPunish", (name) => {
-    // Optional logging or moderation
+  socket.on("spinEnd", (winner) => {
+    client.say("#ringtail216", `🎉 The wheel winner is: ${winner} 🎉`);
+    wheelBlacklisted.add(winner);
+          io.emit("wheelRemoveAndPunish", winner);
+
+    wheelPunished.clear();
+    wheelAccepting = true;
   });
 
   socket.on("resetWheel", () => {
@@ -1047,7 +1048,6 @@ io.on("connection", (socket) => {
     io.emit("resetWheel");
   });
 });
-
 
 
 server.listen(3000, () => {
