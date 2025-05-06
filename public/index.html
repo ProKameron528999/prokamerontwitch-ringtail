@@ -72,6 +72,8 @@
     <input class="option" placeholder="Option 7"><br>
     <input class="option" placeholder="Option 8"><br>
     <input class="option" placeholder="Option 9"><br>
+    <!-- Timer input -->
+<input id="timer" type="number" placeholder="Timer (seconds)" min="0" step="1"><br>
     <button onclick="startPoll()">Start Poll</button>
     <button onclick="endPoll()">End Poll</button>
     <br><button onclick="toggleOverlayVisibility()">Toggle Poll Overlay Visibility</button>
@@ -130,19 +132,21 @@
       });
     }
 
-    function startPoll() {
-      const question = document.getElementById('question').value;
-      const options = Array.from(document.getElementsByClassName('option'))
-        .map(i => i.value.trim()).filter(Boolean);
+function startPoll() {
+  const question = document.getElementById('question').value;
+  const options = Array.from(document.getElementsByClassName('option'))
+    .map(i => i.value.trim()).filter(Boolean);
+  const timer = parseInt(document.getElementById('timer').value, 10);
 
-      if (!question || options.length < 2) {
-        alert('Enter a question and at least 2 options.');
-        return;
-      }
+  if (!question || options.length < 2) {
+    alert('Enter a question and at least 2 options.');
+    return;
+  }
 
-      socket.emit('startPoll', { question, options });
-      alert("Started");
-    }
+  socket.emit('startPoll', { question, options, timer });
+  alert("Started");
+}
+
 
     function endPoll() {
       socket.emit('endPoll');

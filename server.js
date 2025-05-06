@@ -997,12 +997,36 @@ io.on("connection", (socket) => {
     }
     io.emit("pollStarted", currentPoll);
   });
+  
+  let pollTimer = null;
+
+io.on("connection", (socket) => {
+  socket.on("startPoll", (poll) => {
+    currentPoll = {
+      question: poll.question,
+      options: poll.options.map((opt) => opt),
+      votes: {},
+    };
+    console.log(currentPoll.question);
+    console.log(currentPoll.options.join(", "));
+    
+    if (poll.timer > 0) {
+      // Set a timer to end the poll after the specified time
+      pollTimer = setTimeout(() => {
+        endPoll();
+      }, poll.timer * 1000); // Convert seconds to milliseconds
+    }
+
+    io.emit("pollStarted", currentPoll);
+  });
 
   socket.on("togglePollVisibility", () => {
     io.emit("togglePollVisibility");
   });
 
   socket.on("endPoll", () => {
+    clearTimeout(pollTimer); // Clear the timer if poll ends manually
+    pollTimer = null;
     client.say("#ringtail216", "The poll has ended.");
     io.emit("pollEnded", currentPoll);
     currentPoll = null;
