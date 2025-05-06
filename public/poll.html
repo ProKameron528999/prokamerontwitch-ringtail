@@ -100,6 +100,7 @@
   <div id="poll-container" style="display: none;">
     <div class="question" id="question"></div>
     <ul class="options" id="options"></ul>
+    <div id="timer" style="font-size: 1.5em; margin-top: 20px; text-align: center;"></div>
     <div class="ended" id="ended" style="display: none;">📊 Poll Ended</div>
   </div>
 
@@ -181,6 +182,34 @@ socket.on('togglePollVisibility', () => {
     // Optional: hide "poll ended" message
     endedEl.style.display = 'none';
   });
+  
+  let pollEndTime = null;
+
+socket.on('pollStarted', (poll) => {
+  // Store the end time if a timer is set
+  if (poll.timer > 0) {
+    pollEndTime = Date.now() + poll.timer * 1000;
+    updateTimer();
+  } else {
+    document.getElementById('timer').textContent = '';
+  }
+});
+
+socket.on('pollEnded', () => {
+  document.getElementById('timer').textContent = 'Poll Ended';
+});
+  
+  function updateTimer() {
+  if (pollEndTime) {
+    const timeLeft = Math.max(0, pollEndTime - Date.now());
+    const secondsLeft = Math.floor(timeLeft / 1000);
+    document.getElementById('timer').textContent = `Time left: ${secondsLeft} seconds`;
+    
+    if (timeLeft > 0) {
+      setTimeout(updateTimer, 1000);
+    }
+  }
+}
 </script>
 </body>
 </html>
