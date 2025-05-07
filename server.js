@@ -19,6 +19,7 @@ characterAI.setup("F0B-9H4f8Gsj3AS9owDhSFrhNAe7w4eo3nAGKfAHzWM", process.env.CHA
 
 
 const https = require("https");
+const fetch = require("node-fetch");
 
 let logMessages = true
 
@@ -56,39 +57,36 @@ function sendWebhook(message) {
   req.write(data);
   req.end();
 }
-function sendWebhookMessageAswell(message) {
-  const data = JSON.stringify({ content: message });
 
-  const url = new URL(process.env.WEBHOOK3);
-  const options = {
-    hostname: url.hostname,
-    path: url.pathname + url.search,
-    method: "POST",
+
+const clientId = process.env.CLIENT_ID;
+const accessToken = process.env.ACCESS_TOKEN;
+
+async function getTwitchUserInfo(username) {
+  const res = await fetch(`https://api.twitch.tv/helix/users?login=${username}`, {
     headers: {
-      "Content-Type": "application/json",
-      "Content-Length": data.length,
+      "Client-ID": clientId,
+      "Authorization": `Bearer ${accessToken}`,
     },
-  };
-  const req = https.request(options, (res) => {
-    if (res.statusCode === 204) {
-      //  console.log('Message sent successfully.');
-    } else {
-      console.error(`Failed to send message. Status code: ${res.statusCode}`);
-    }
   });
-
-  req.on("error", (error) => {
-    console.error("Error sending message:", error);
-  });
-
-  req.write(data);
-  req.end();
+  const data = await res.json();
+  return data.data[0] || null;
 }
 
-function sendWebhookMessage(message) {
-if(!logMessages) return;
-  const data = JSON.stringify({ content: message });
+async function sendWebhookMessage(username, message) {
+  if (!logMessages) return;
 
+  const userInfo = await getTwitchUserInfo(username);
+  const displayName = userInfo?.display_name || username;
+  const avatarUrl = userInfo?.profile_image_url;
+
+  const payload = {
+    username: displayName,
+    avatar_url: avatarUrl,
+    content: message,
+  };
+
+  const data = JSON.stringify(payload);
   const url = new URL(process.env.WEBHOOK2);
   const options = {
     hostname: url.hostname,
@@ -99,10 +97,9 @@ if(!logMessages) return;
       "Content-Length": data.length,
     },
   };
+
   const req = https.request(options, (res) => {
-    if (res.statusCode === 204) {
-      //  console.log('Message sent successfully.');
-    } else {
+    if (res.statusCode !== 204) {
       console.error(`Failed to send message. Status code: ${res.statusCode}`);
     }
   });
@@ -113,7 +110,45 @@ if(!logMessages) return;
 
   req.write(data);
   req.end();
-  sendWebhookMessageAswell(message)
+
+  sendWebhookMessageAswell(username, message);
+}
+
+async function sendWebhookMessageAswell(username, message) {
+  const userInfo = await getTwitchUserInfo(username);
+  const displayName = userInfo?.display_name || username;
+  const avatarUrl = userInfo?.profile_image_url;
+
+  const payload = {
+    username: displayName,
+    avatar_url: avatarUrl,
+    content: message,
+  };
+
+  const data = JSON.stringify(payload);
+  const url = new URL(process.env.WEBHOOK3);
+  const options = {
+    hostname: url.hostname,
+    path: url.pathname + url.search,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": data.length,
+    },
+  };
+
+  const req = https.request(options, (res) => {
+    if (res.statusCode !== 204) {
+      console.error(`Failed to send message (aswell). Status code: ${res.statusCode}`);
+    }
+  });
+
+  req.on("error", (error) => {
+    console.error("Error sending message (aswell):", error);
+  });
+
+  req.write(data);
+  req.end();
 }
 
 
@@ -445,22 +480,20 @@ client.on("part", (channel, username, self) => {
     client.say(channel, `${username} has left...`);
   }
 });*/
-client.on("message",  (channel, tags, message, self) => {
-  //  if (!self) {
-  log(`[${channel}] <${tags["display-name"] || tags.username}>: ${message}`);
+client.on("message", async (channel, tags, message, self) => {
+  const username = tags.username;
+  const display = tags["display-name"] || username;
+  log(`[${channel}] <${display}>: ${message}`);
+
   const containsSlur =
     racialslur.some((word) => normalizeText(message).includes(word)) ||
     lessStrictSlurs.some((word) => lessnormalizeText(message).includes(word));
-  if (containsSlur) {
-    sendWebhookMessage(
-      `**<${tags["display-name"] || tags.username}>**: [SLUR CENSORED]`
-    );
-  } else {
-    sendWebhookMessage(
-      `**<${tags["display-name"] || tags.username}>**: ${message}`
-    );
-    //    }
-  }
+
+  const finalMessage = containsSlur
+    ? `[SLUR CENSORED]`
+    : `${message}`;
+
+  await sendWebhookMessage(username, finalMessage);
 });
 
 client.on("clearchat", (channel) => {
