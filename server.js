@@ -1,11 +1,10 @@
 //process.exit(); 
 const ran = require("./lib/random");
+// setInterval(() => {
+//    let stupidthing = ran.chooseAngryResponse();
 
-    let stupidthing = ran.chooseAngryResponse();
-    console.log(
-      `[AUTO-RESPONSE] ${stupidthing} @user (response #${stupidthing.index})`
-    );
-
+    //console.log(`[AUTO-RESPONSE] ${stupidthing}user (response #${stupidthing.index})`);
+// }, 1000)
 const censorbot = require("./api/index.js");
 
 censorbot.authenticate(process.env.TOKEN);
@@ -875,7 +874,7 @@ if (message.includes("pk!dodaily")) {
     let response = ran.chooseAngryResponse();
     userclient.say(
       channel,
-      `[AUTO-RESPONSE] ${response} ${tags["display-name"]} (response #${response.index})`
+      `[AUTO-RESPONSE] ${response}${tags["display-name"]} (response #${response.index})`
     );
   }
 });
