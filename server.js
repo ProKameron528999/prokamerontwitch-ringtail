@@ -1121,12 +1121,12 @@ client.on("message", (channel, tags, message, self) => {
       wheelEntries.push("testuser8");
       io.emit("wheelAdd", "testuser8");
 }*/
-  if (msg === "1") {
+  if (msg === "W") {
     if (wheelEntries.includes(username)) {
       // Remove and punish
       wheelEntries = wheelEntries.filter(n => n !== username);
       wheelPunished.add(username);
-      client.say(channel, `@${username}, you already typed 1, moron! You know what, I'm removing you from the wheel. Don't do that again.`);
+      client.say(channel, `@${username}, you already typed W, moron! You know what, I'm removing you from the wheel. Don't do that again.`);
       io.emit("wheelRemoveAndPunish", username);
     } else if (!wheelPunished.has(username)) {
       wheelEntries.push(username);
