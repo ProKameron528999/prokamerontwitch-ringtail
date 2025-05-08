@@ -1,4 +1,4 @@
-//process.exit(); 
+process.exit(); 
 const ran = require("./lib/random");
 // setInterval(() => {
 //    let stupidthing = ran.chooseAngryResponse();
