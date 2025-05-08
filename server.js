@@ -1,4 +1,4 @@
-process.exit(); 
+//process.exit(); 
 const ran = require("./lib/random");
 // setInterval(() => {
 //    let stupidthing = ran.chooseAngryResponse();
@@ -1055,7 +1055,6 @@ io.on("connection", (socket) => {
   
   let pollTimer = null;
 
-io.on("connection", (socket) => {
   socket.on("startPoll", (poll) => {
     currentPoll = {
       question: poll.question,
@@ -1089,7 +1088,6 @@ io.on("connection", (socket) => {
     io.emit("pollEnded", currentPoll);
     currentPoll = null;
   });
-})
 });
 let wheelEntries = [];
 let wheelPunished = new Set();
