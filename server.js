@@ -81,9 +81,9 @@ async function sendWebhookMessage(username, message) {
   const avatarUrl = userInfo?.profile_image_url;
 
   const payload = {
-    username: displayName,
-    avatar_url: avatarUrl,
-    content: message,
+    username: displayName || "Failed to load data",
+    avatar_url: avatarUrl || "https://uxwing.com/wp-content/themes/uxwing/download/video-photography-multimedia/error-image-photo-icon.png",
+    content: message || "Failed to load data",
   };
 
   const data = JSON.stringify(payload);
