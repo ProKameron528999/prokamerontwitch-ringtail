@@ -483,6 +483,7 @@ client.on("part", (channel, username, self) => {
 client.on("message", async (channel, tags, message, self) => {
   const username = tags.username;
   const display = tags["display-name"] || username;
+
   log(`[${channel}] <${display}>: ${message}`);
 
   const containsSlur =
