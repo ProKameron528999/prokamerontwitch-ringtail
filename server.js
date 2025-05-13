@@ -1076,7 +1076,7 @@ client.on("message", (channel, tags, message, self) => {
       wheelEntries.push("testuser8");
       io.emit("wheelAdd", "testuser8");
 }*/
-  if (msg === "W" || msg == "w" || msg == "1") {
+  if (msg === "W" || msg == "w" || msg == "1" || msg == "!play" || msg == "!join") {
     if (wheelEntries.includes(username)) {
       // Remove and punish
       wheelEntries = wheelEntries.filter(n => n !== username);
