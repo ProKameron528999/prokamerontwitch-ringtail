@@ -63,15 +63,23 @@ const clientId = process.env.CLIENT_ID;
 const accessToken = process.env.ACCESS_TOKEN;
 
 async function getTwitchUserInfo(username) {
-  const res = await fetch(`https://api.twitch.tv/helix/users?login=${username}`, {
+  const res = await fetch(`https://www.twitch.tv/${username}`, {
     headers: {
-      "Client-ID": clientId,
-      "Authorization": `Bearer ${accessToken}`,
+      "Accept": "text/html",
     },
   });
-  const data = await res.json();
-  return data.data[0] || null;
+  const text = await res.text();
+  const match = text.match(/"channel_id":"(\d+)"/);
+  if (match) {
+    return {
+      username,
+      id: match[1],
+    };
+  } else {
+    return null;
+  }
 }
+
 
 async function sendWebhookMessage(username, message) {
   if (!logMessages) return;
