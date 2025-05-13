@@ -1078,11 +1078,11 @@ client.on("message", (channel, tags, message, self) => {
 }*/
   if (msg === "W" || msg == "w" || msg == "1" || msg == "!play" || msg == "!join") {
     if (wheelEntries.includes(username)) {
-      // Remove and punish
+   /*   // Remove and punish
       wheelEntries = wheelEntries.filter(n => n !== username);
       wheelPunished.add(username);
     //  client.say(channel, `@${username}, you already typed W, moron! You know what, I'm removing you from the wheel. Don't do that again.`);
-      io.emit("wheelRemoveAndPunish", username);
+      io.emit("wheelRemoveAndPunish", username);*/
     } else if (!wheelPunished.has(username)) {
       wheelEntries.push(username);
       io.emit("wheelAdd", username);
