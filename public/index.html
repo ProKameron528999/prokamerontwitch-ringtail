@@ -53,12 +53,14 @@
 </head>
 <body>
   <h1>Ringtail Poll Control</h1>
-
+  
+  <!-- Security Key Prompt -->
   <div id="securityPrompt">
     <input id="securityKey" type="password" placeholder="Enter security key" /><br>
-    <button onclick="verifySecurityKey()">Submit</button>
+    <button onclick="verifySecurityKey()">Submit</button> 
   </div>
 
+  <!-- Poll Controls (Initially hidden) -->
   <div id="pollControls" class="hidden">
     <input id="question" placeholder="Poll question"><br>
     <input class="option" placeholder="Option 1"><br>
@@ -70,48 +72,59 @@
     <input class="option" placeholder="Option 7"><br>
     <input class="option" placeholder="Option 8"><br>
     <input class="option" placeholder="Option 9"><br>
-    <input id="timer" type="number" placeholder="Timer (seconds)" min="0" step="1"><br>
+    <!-- Timer input -->
+<input id="timer" type="number" placeholder="Timer (seconds)" min="0" step="1"><br>
     <button onclick="startPoll()">Start Poll</button>
     <button onclick="endPoll()">End Poll</button>
     <br><button onclick="toggleOverlayVisibility()">Toggle Poll Overlay Visibility</button>
+    
+
+<script>
+  function toggleOverlayVisibility() {
+    socket.emit('togglePollVisibility');    alert("Hidden")
+
+  }
+</script>
+
 
     <div class="embed-info">
       <p>🔗 Open <code>poll.html</code> in OBS as a browser source to show the live poll.</p>
       <div id="voteStats" style="margin-top: 20px; text-align: left;">
-        <h3>Total Votes: <span id="totalVotes">0</span></h3>
-        <div id="voterList" style="white-space: pre-wrap; font-family: monospace;"></div>
-      </div>
+  <h3>Total Votes: <span id="totalVotes">0</span></h3>
+  <div id="voterList" style="white-space: pre-wrap; font-family: monospace;"></div>
+</div>
+
     </div>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
-    let securityKey = "";
-
     socket.on("voteUpdate", (votes) => {
-      const totalVotesEl = document.getElementById("totalVotes");
-      const voterListEl = document.getElementById("voterList");
+  const totalVotesEl = document.getElementById("totalVotes");
+  const voterListEl = document.getElementById("voterList");
 
-      const entries = Object.entries(votes);
-      totalVotesEl.textContent = entries.length;
+  const entries = Object.entries(votes);
+  totalVotesEl.textContent = entries.length;
 
-      const display = entries.map(([user, vote]) => `${user}: ${vote}`).join("\n");
-      voterListEl.textContent = display;
-    });
+  const display = entries.map(([user, vote]) => `${user}: ${vote}`).join("\n");
+  voterListEl.textContent = display;
+});
+
 
     function verifySecurityKey() {
-      const key = document.getElementById('securityKey').value;
+      const securityKey = document.getElementById('securityKey').value;
 
       fetch('/verify-key', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ key: securityKey })
       })
-      .then(res => res.json())
+      .then(response => response.json())
       .then(data => {
         if (data.success) {
-          securityKey = key;
           document.getElementById('securityPrompt').style.display = 'none';
           document.getElementById('pollControls').style.display = 'block';
         } else {
@@ -120,29 +133,25 @@
       });
     }
 
-    function startPoll() {
-      const question = document.getElementById('question').value;
-      const options = Array.from(document.getElementsByClassName('option'))
-        .map(i => i.value.trim()).filter(Boolean);
-      const timer = parseInt(document.getElementById('timer').value, 10);
+function startPoll() {
+  const question = document.getElementById('question').value;
+  const options = Array.from(document.getElementsByClassName('option'))
+    .map(i => i.value.trim()).filter(Boolean);
+  const timer = parseInt(document.getElementById('timer').value, 10);
 
-      if (!question || options.length < 2) {
-        alert('Enter a question and at least 2 options.');
-        return;
-      }
+  if (!question || options.length < 2) {
+    alert('Enter a question and at least 2 options.');
+    return;
+  }
 
-      socket.emit('startPoll', { key: securityKey, question, options, timer });
-      alert("Started");
-    }
+  socket.emit('startPoll', { question, options, timer });
+  alert("Started");
+}
+
 
     function endPoll() {
-      socket.emit('endPoll', { key: securityKey });
+      socket.emit('endPoll');
       alert("Ended");
-    }
-
-    function toggleOverlayVisibility() {
-      socket.emit('togglePollVisibility', { key: securityKey });
-      alert("Toggled visibility");
     }
   </script>
 </body>
