@@ -1053,6 +1053,8 @@ io.on("connection", (socket) => {
   let pollTimer = null;
 
   socket.on("startPoll", (poll) => {
+        if (!isAuthorizedKey(poll.key)) return;
+
     currentPoll = {
       question: poll.question,
       options: poll.options.map((opt) => opt),
