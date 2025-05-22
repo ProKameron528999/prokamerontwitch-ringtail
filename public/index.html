@@ -144,13 +144,16 @@ function startPoll() {
     alert('Enter a question and at least 2 options.');
     return;
   }
+      const securityKey = document.getElementById('securityKey').value;
 
-  socket.emit('startPoll', { key, question, options, timer });
+  socket.emit('startPoll', { key: securityKey, question: question, options: options, timer: timer });
   alert("Started");
 }
 
 
     function endPoll() {
+            const securityKey = document.getElementById('securityKey').value;
+
 socket.emit("endPoll", { key: securityKey });
       alert("Ended");
     }

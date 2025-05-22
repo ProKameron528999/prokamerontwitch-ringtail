@@ -146,6 +146,8 @@
 function spinWheel() {
   if (names.length === 0 || spinning) return;
   spinning = true;
+        const securityKey = document.getElementById('securityKey').value;
+
 socket.emit("spinStart", { key: securityKey });
 
   const anglePerSlice = (2 * Math.PI) / names.length;
@@ -170,6 +172,8 @@ socket.emit("spinStart", { key: securityKey });
       drawWheel(angle);
       spinning = false;
       winnerDisplay.textContent = `🎉 Winner: ${winner}`;
+            const securityKey = document.getElementById('securityKey').value;
+
 socket.emit("spinEnd", { key: securityKey, winner: winner });
 });
     }
@@ -202,7 +206,9 @@ socket.emit("spinEnd", { key: securityKey, winner: winner });
 
     spinBtn.addEventListener("click", spinWheel);
     resetBtn.addEventListener("click", () => {
-      socket.emit("resetWheel");
+            const securityKey = document.getElementById('securityKey').value;
+
+socket.emit("resetWheel", { key: securityKey });
     });
 
     // Password verification logic

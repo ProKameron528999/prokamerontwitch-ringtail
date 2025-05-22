@@ -985,32 +985,22 @@ client.on("message", (channel, tags, message, self) => {
 });
 
 io.on("connection", (socket) => {
-  socket.on("startPoll", (poll) => {
+  socket.on("startPoll", (data) => {
+    if (!isAuthorizedKey(data.key)) return;
+
     currentPoll = {
-      question: poll.question,
-      options: poll.options.map((opt) => opt),
+      question: data.question,
+      options: data.options.map((opt) => opt),
+      timer: data.timer || 0,
       votes: {},
     };
-    console.log(currentPoll.question);
-    console.log(currentPoll.options.join(", "));
-    if (
-      racialslur.some((word) =>
-        normalizeText(currentPoll.options.join(", ")).includes(word)
-      )
-    ) {
-   //   client.say(
-   //     "#ringtail216",
-   //     `WARNING! SOMEONE ENTERED A POTENTIAL SLUR INTO THE POLL SYSTEM! THE PASSWORD MAY HAVE BEEN LEAKED! @ringtail216 @prokameron`
-   //   );
-    } else {
-  //    client.say(
-  //      "#ringtail216",
-   //     "The poll has started! " +
-   //       currentPoll.question +
-   //       ' Vote in chat using "!vote <option number>" or just type the number. Options: ' +
-   //       currentPoll.options.join(", ")
-   //   );
+
+    if (data.timer > 0) {
+      pollTimer = setTimeout(() => {
+        endPoll();
+      }, data.timer * 1000);
     }
+
     io.emit("pollStarted", currentPoll);
   });
   
@@ -1037,15 +1027,17 @@ io.on("connection", (socket) => {
     io.emit("pollStarted", currentPoll);
   });
 
-  socket.on("togglePollVisibility", () => {
+  socket.on("togglePollVisibility", (data) => {
+    if (!isAuthorizedKey(data.key)) return;
     io.emit("togglePollVisibility");
   });
   
 
-  socket.on("endPoll", () => {
-    clearTimeout(pollTimer); // Clear the timer if poll ends manually
+  socket.on("endPoll", (data) => {
+    if (!isAuthorizedKey(data.key)) return;
+
+    clearTimeout(pollTimer);
     pollTimer = null;
-  //  client.say("#ringtail216", "The poll has ended.");
     io.emit("pollEnded", currentPoll);
     currentPoll = null;
   });
@@ -1093,26 +1085,33 @@ client.on("message", (channel, tags, message, self) => {
     }
   }
 });
-
+function isAuthorizedKey(key) {
+  return key === process.env.SECRET;
+}
 io.on("connection", (socket) => {
   // Send existing entries if needed
   wheelEntries.forEach(name => socket.emit("wheelAdd", name));
 
-  socket.on("spinStart", () => {
+  socket.on("spinStart", (data) => {
+    if (!isAuthorizedKey(data.key)) return;
     wheelAccepting = false;
   });
 
-  socket.on("spinEnd", (winner) => {
-   // client.say("#ringtail216", `🎉 The wheel winner is: ${winner} 🎉`);
-        wheelBlacklisted.clear();
-    wheelBlacklisted.add(winner);
-          io.emit("wheelRemoveAndPunish", winner);
 
+  socket.on("spinEnd", (data) => {
+    if (!isAuthorizedKey(data.key)) return;
+
+    const winner = data.winner;
+    wheelBlacklisted.clear();
+    wheelBlacklisted.add(winner);
+    io.emit("wheelRemoveAndPunish", winner);
     wheelPunished.clear();
     wheelAccepting = true;
   });
 
-  socket.on("resetWheel", () => {
+  socket.on("resetWheel", (data) => {
+    if (!isAuthorizedKey(data.key)) return;
+
     wheelEntries = [];
     wheelPunished.clear();
     wheelBlacklisted.clear();
