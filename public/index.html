@@ -81,7 +81,8 @@
 
 <script>
   function toggleOverlayVisibility() {
-    socket.emit('togglePollVisibility');    alert("Hidden")
+    socket.emit("togglePollVisibility", { key: securityKey });
+   alert("Hidden")
 
   }
 </script>
@@ -144,13 +145,13 @@ function startPoll() {
     return;
   }
 
-  socket.emit('startPoll', { question, options, timer });
+  socket.emit('startPoll', { key, question, options, timer });
   alert("Started");
 }
 
 
     function endPoll() {
-      socket.emit('endPoll');
+socket.emit("endPoll", { key: securityKey });
       alert("Ended");
     }
   </script>

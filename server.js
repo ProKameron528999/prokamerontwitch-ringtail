@@ -873,6 +873,9 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+
+
+
 let currentPoll = null;
 let pollTimer = null;
 
@@ -896,6 +899,7 @@ const blacklist = ["ringbot216"];
 
 app.use(express.json());
 app.use(express.static("public"));
+
 
 app.post("/verify-key", (req, res) => {
   const { key } = req.body;

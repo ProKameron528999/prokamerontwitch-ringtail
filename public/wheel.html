@@ -146,7 +146,7 @@
 function spinWheel() {
   if (names.length === 0 || spinning) return;
   spinning = true;
-  socket.emit("spinStart");
+socket.emit("spinStart", { key: securityKey });
 
   const anglePerSlice = (2 * Math.PI) / names.length;
   let angle = 0;
@@ -170,7 +170,8 @@ function spinWheel() {
       drawWheel(angle);
       spinning = false;
       winnerDisplay.textContent = `🎉 Winner: ${winner}`;
-      socket.emit("spinEnd", winner);
+socket.emit("spinEnd", { key: securityKey, winner: winner });
+});
     }
   }
 
