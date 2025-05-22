@@ -873,6 +873,11 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+function verifyKey(key) {
+  return key === process.env.SECRET;
+}
+
+
 let currentPoll = null;
 let pollTimer = null;
 
@@ -1012,39 +1017,42 @@ io.on("connection", (socket) => {
   
   let pollTimer = null;
 
-  socket.on("startPoll", (poll) => {
-    currentPoll = {
-      question: poll.question,
-      options: poll.options.map((opt) => opt),
-      timer: poll.timer || 0,
-      votes: {},
-    };
-    console.log(currentPoll.question);
-    console.log(currentPoll.options.join(", "));
-   // console.log(poll.timer) 
-    if (poll.timer > 0) {
-    //  console.log(poll.timer)
-      // Set a timer to end the poll after the specified time
-      pollTimer = setTimeout(() => {
-        endPoll();
-      }, poll.timer * 1000); // Convert seconds to milliseconds
-    }
+socket.on("startPoll", (poll) => {
+  if (!verifyKey(poll.key)) return;
 
-    io.emit("pollStarted", currentPoll);
-  });
+  currentPoll = {
+    question: poll.question,
+    options: poll.options.map((opt) => opt),
+    timer: poll.timer || 0,
+    votes: {},
+  };
 
-  socket.on("togglePollVisibility", () => {
-    io.emit("togglePollVisibility");
-  });
+  if (poll.timer > 0) {
+    pollTimer = setTimeout(() => {
+      endPoll();
+    }, poll.timer * 1000);
+  }
+
+  io.emit("pollStarted", currentPoll);
+});
+
+
+socket.on("togglePollVisibility", (data) => {
+  if (!verifyKey(data?.key)) return;
+  io.emit("togglePollVisibility");
+});
+
   
 
-  socket.on("endPoll", () => {
-    clearTimeout(pollTimer); // Clear the timer if poll ends manually
-    pollTimer = null;
-  //  client.say("#ringtail216", "The poll has ended.");
-    io.emit("pollEnded", currentPoll);
-    currentPoll = null;
-  });
+socket.on("endPoll", (data) => {
+  if (!verifyKey(data?.key)) return;
+
+  clearTimeout(pollTimer);
+  pollTimer = null;
+  io.emit("pollEnded", currentPoll);
+  currentPoll = null;
+});
+
 });
 let wheelEntries = [];
 let wheelPunished = new Set();
@@ -1094,28 +1102,32 @@ io.on("connection", (socket) => {
   // Send existing entries if needed
   wheelEntries.forEach(name => socket.emit("wheelAdd", name));
 
-  socket.on("spinStart", () => {
-    wheelAccepting = false;
-  });
-
-  socket.on("spinEnd", (winner) => {
-   // client.say("#ringtail216", `🎉 The wheel winner is: ${winner} 🎉`);
-        wheelBlacklisted.clear();
-    wheelBlacklisted.add(winner);
-          io.emit("wheelRemoveAndPunish", winner);
-
-    wheelPunished.clear();
-    wheelAccepting = true;
-  });
-
-  socket.on("resetWheel", () => {
-    wheelEntries = [];
-    wheelPunished.clear();
-    wheelBlacklisted.clear();
-    wheelAccepting = true;
-    io.emit("resetWheel");
-  });
+socket.on("spinStart", (data) => {
+  if (!verifyKey(data?.key)) return;
+  wheelAccepting = false;
 });
+
+socket.on("spinEnd", ({ winner, key }) => {
+  if (!verifyKey(key)) return;
+
+  wheelBlacklisted.clear();
+  wheelBlacklisted.add(winner);
+  io.emit("wheelRemoveAndPunish", winner);
+
+  wheelPunished.clear();
+  wheelAccepting = true;
+});
+
+socket.on("resetWheel", (data) => {
+  if (!verifyKey(data?.key)) return;
+
+  wheelEntries = [];
+  wheelPunished.clear();
+  wheelBlacklisted.clear();
+  wheelAccepting = true;
+  io.emit("resetWheel");
+});
+})
 
 
 server.listen(3000, () => {
