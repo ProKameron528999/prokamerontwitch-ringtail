@@ -984,6 +984,52 @@ client.on("message", (channel, tags, message, self) => {
   }
 });
 
+let wheelEntries = [];
+let wheelPunished = new Set();
+let wheelBlacklisted = new Set();
+let wheelAccepting = true;
+
+client.on("message", (channel, tags, message, self) => {
+  if (self) return;
+
+  const username = tags.username;
+  const msg = message.trim();
+
+  if (!wheelAccepting || wheelBlacklisted.has(username)) return;
+/*if(msg === "pk!testusers") {
+      wheelEntries.push("testuser1");
+      io.emit("wheelAdd", "testuser1");
+      wheelEntries.push("testuser2");
+      io.emit("wheelAdd", "testuser2");
+      wheelEntries.push("testuser3");
+      io.emit("wheelAdd", "testuser3");
+      wheelEntries.push("testuser4");
+      io.emit("wheelAdd", "testuser4");
+      wheelEntries.push("testuser5");
+      io.emit("wheelAdd", "testuser5");
+      wheelEntries.push("testuser6");
+      io.emit("wheelAdd", "testuser6");
+      wheelEntries.push("testuser7");
+      io.emit("wheelAdd", "testuser7");
+      wheelEntries.push("testuser8");
+      io.emit("wheelAdd", "testuser8");
+}*/
+  if (msg === "W" || msg == "w" || msg == "1" || msg == "!play" || msg == "!join") {
+    if (wheelEntries.includes(username)) {
+   /*   // Remove and punish
+      wheelEntries = wheelEntries.filter(n => n !== username);
+      wheelPunished.add(username);
+    //  client.say(channel, `@${username}, you already typed W, moron! You know what, I'm removing you from the wheel. Don't do that again.`);
+      io.emit("wheelRemoveAndPunish", username);*/
+    } else if (!wheelPunished.has(username)) {
+      wheelEntries.push(username);
+      io.emit("wheelAdd", username);
+    }
+  }
+});
+function isAuthorizedKey(key) {
+  return key === process.env.SECRET;
+}
 io.on("connection", (socket) => {
   socket.on("startPoll", (data) => {
     if (!isAuthorizedKey(data.key)) return;
@@ -1042,83 +1088,6 @@ io.on("connection", (socket) => {
     currentPoll = null;
   });
 });
-let wheelEntries = [];
-let wheelPunished = new Set();
-let wheelBlacklisted = new Set();
-let wheelAccepting = true;
-
-client.on("message", (channel, tags, message, self) => {
-  if (self) return;
-
-  const username = tags.username;
-  const msg = message.trim();
-
-  if (!wheelAccepting || wheelBlacklisted.has(username)) return;
-/*if(msg === "pk!testusers") {
-      wheelEntries.push("testuser1");
-      io.emit("wheelAdd", "testuser1");
-      wheelEntries.push("testuser2");
-      io.emit("wheelAdd", "testuser2");
-      wheelEntries.push("testuser3");
-      io.emit("wheelAdd", "testuser3");
-      wheelEntries.push("testuser4");
-      io.emit("wheelAdd", "testuser4");
-      wheelEntries.push("testuser5");
-      io.emit("wheelAdd", "testuser5");
-      wheelEntries.push("testuser6");
-      io.emit("wheelAdd", "testuser6");
-      wheelEntries.push("testuser7");
-      io.emit("wheelAdd", "testuser7");
-      wheelEntries.push("testuser8");
-      io.emit("wheelAdd", "testuser8");
-}*/
-  if (msg === "W" || msg == "w" || msg == "1" || msg == "!play" || msg == "!join") {
-    if (wheelEntries.includes(username)) {
-   /*   // Remove and punish
-      wheelEntries = wheelEntries.filter(n => n !== username);
-      wheelPunished.add(username);
-    //  client.say(channel, `@${username}, you already typed W, moron! You know what, I'm removing you from the wheel. Don't do that again.`);
-      io.emit("wheelRemoveAndPunish", username);*/
-    } else if (!wheelPunished.has(username)) {
-      wheelEntries.push(username);
-      io.emit("wheelAdd", username);
-    }
-  }
-});
-function isAuthorizedKey(key) {
-  return key === process.env.SECRET;
-}
-io.on("connection", (socket) => {
-  // Send existing entries if needed
-  wheelEntries.forEach(name => socket.emit("wheelAdd", name));
-
-  socket.on("spinStart", (data) => {
-    if (!isAuthorizedKey(data.key)) return;
-    wheelAccepting = false;
-  });
-
-
-  socket.on("spinEnd", (data) => {
-    if (!isAuthorizedKey(data.key)) return;
-
-    const winner = data.winner;
-    wheelBlacklisted.clear();
-    wheelBlacklisted.add(winner);
-    io.emit("wheelRemoveAndPunish", winner);
-    wheelPunished.clear();
-    wheelAccepting = true;
-  });
-
-  socket.on("resetWheel", (data) => {
-    if (!isAuthorizedKey(data.key)) return;
-
-    wheelEntries = [];
-    wheelPunished.clear();
-    wheelBlacklisted.clear();
-    wheelAccepting = true;
-    io.emit("resetWheel");
-  });
-});
 
 
 server.listen(3000, () => {
@@ -1142,7 +1111,7 @@ userclient.connect().catch(console.error);
 //entity4.connect().catch(console.error);
 //entity5.connect().catch(console.error);
 
-
+ 
 process.on("unhandledRejection", (reason, p) => {
   console.error(reason, p);
 });
