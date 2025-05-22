@@ -873,265 +873,104 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-function verifyKey(key) {
-  return key === process.env.SECRET;
-}
+app.use(express.static('public'));
+app.use(express.json());
 
+const SECRET = process.env.SECRET || "changeme";
 
 let currentPoll = null;
 let pollTimer = null;
+let wheelEntries = [];
+let wheelBlacklisted = new Set();
+let wheelPunished = new Set();
+let wheelAccepting = true;
 
-function endPoll() {
-  // If there is an active poll, clear the timer and emit pollEnded event
-  if (pollTimer) {
-    clearTimeout(pollTimer);
-    pollTimer = null;
-  }
-  
-  if (currentPoll) {
-    // Emit the "pollEnded" event to the clients
-    io.emit("pollEnded", currentPoll);
-   // client.say("#ringtail216", "The poll has ran out of time.");
-
-    // Reset the current poll
-    currentPoll = null;
-  }
+function isValidKey(providedKey) {
+  return providedKey === SECRET;
 }
-const blacklist = ["ringbot216"];
 
-app.use(express.json());
-app.use(express.static("public"));
-
-app.post("/verify-key", (req, res) => {
+app.post('/verify-key', (req, res) => {
   const { key } = req.body;
-
-  if (key === process.env.SECRET) {
-    res.json({ success: true });
-  //  client.say(
-  //    "#ringtail216",
-  //    "@ringtail216, a user just accessed the poll control panel. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password."
-  //  );
-  } else {
-    res.json({ success: false });
-  }
-});
-
-app.post("/verify-wheel-key", (req, res) => {
-  const { key } = req.body;
-
-  if (key === process.env.SECRET) {
-    res.json({ success: true });
-  //  client.say(  "#ringtail216",  "@ringtail216, a user just accessed the wheel spinner. If this is not you, please let @prokameron know IMMEDIATELY so that he changes the password.");
-  } else {
-    res.json({ success: false });
-  }
-}); 
-
-
-client.on("message", (channel, tags, message, self) => {
-  if (self) return;
-
-  const username = tags.username;
-  const displayName = tags["display-name"];
-  if (blacklist.includes(username)) return;
-
-  const lowerMsg = message.trim().toLowerCase();
-
-  // --- Handle Voting ---
-  let input = null;
-
-  if (lowerMsg.startsWith("!vote ")) {
-    input = lowerMsg.split(" ")[1];
-  } else if (/^\d+$/.test(lowerMsg)) {
-    input = lowerMsg;
-  } else if (currentPoll?.options.includes(lowerMsg)) {
-    input = lowerMsg;
-  }
-
-  if (input && currentPoll) {
-    let vote = null;
-    const voteIndex = parseInt(input, 10);
-
-    if (
-      !isNaN(voteIndex) &&
-      voteIndex >= 1 &&
-      voteIndex <= currentPoll.options.length
-    ) {
-      vote = currentPoll.options[voteIndex - 1];
-    } else if (currentPoll.options.includes(input)) {
-      vote = input;
-    }
-
-    if (vote) {
-      currentPoll.votes[username] = vote;
-      io.emit("voteUpdate", currentPoll.votes);
-    }
-  }
-
-  // --- Handle Vote Removal ---
-  if (lowerMsg.startsWith("!removevote ")) {
-    const targetUser = lowerMsg.split(" ")[1]?.toLowerCase();
-    const isAuthorized =
-      username === "ringtail216" || username === "prokameron";
-
-    if (!currentPoll) return;
-    if (!isAuthorized) return;
-
-    if (!targetUser || !currentPoll.votes[targetUser]) return;
-
-    delete currentPoll.votes[targetUser];
- //   client.say(channel, `${displayName} removed ${targetUser}'s vote.`);
-    io.emit("voteUpdate", currentPoll.votes);
-  }
+  res.json({ success: key === SECRET });
 });
 
 io.on("connection", (socket) => {
-  socket.on("startPoll", (poll) => {
+  socket.on("startPoll", (data) => {
+    if (!isValidKey(data.key)) return;
+
     currentPoll = {
-      question: poll.question,
-      options: poll.options.map((opt) => opt),
-      votes: {},
+      question: data.question,
+      options: data.options,
+      timer: data.timer || 0,
+      votes: {}
     };
-    console.log(currentPoll.question);
-    console.log(currentPoll.options.join(", "));
-    if (
-      racialslur.some((word) =>
-        normalizeText(currentPoll.options.join(", ")).includes(word)
-      )
-    ) {
-   //   client.say(
-   //     "#ringtail216",
-   //     `WARNING! SOMEONE ENTERED A POTENTIAL SLUR INTO THE POLL SYSTEM! THE PASSWORD MAY HAVE BEEN LEAKED! @ringtail216 @prokameron`
-   //   );
-    } else {
-  //    client.say(
-  //      "#ringtail216",
-   //     "The poll has started! " +
-   //       currentPoll.question +
-   //       ' Vote in chat using "!vote <option number>" or just type the number. Options: ' +
-   //       currentPoll.options.join(", ")
-   //   );
+
+    if (currentPoll.timer > 0) {
+      pollTimer = setTimeout(() => endPoll(), currentPoll.timer * 1000);
     }
+
     io.emit("pollStarted", currentPoll);
   });
-  
-  let pollTimer = null;
 
-socket.on("startPoll", (poll) => {
-  if (!verifyKey(poll.key)) return;
+  socket.on("endPoll", (data) => {
+    if (!isValidKey(data.key)) return;
 
-  currentPoll = {
-    question: poll.question,
-    options: poll.options.map((opt) => opt),
-    timer: poll.timer || 0,
-    votes: {},
-  };
+    clearTimeout(pollTimer);
+    pollTimer = null;
+    io.emit("pollEnded", currentPoll);
+    currentPoll = null;
+  });
 
-  if (poll.timer > 0) {
-    pollTimer = setTimeout(() => {
-      endPoll();
-    }, poll.timer * 1000);
-  }
+  socket.on("togglePollVisibility", (data) => {
+    if (!isValidKey(data.key)) return;
+    io.emit("togglePollVisibility");
+  });
 
-  io.emit("pollStarted", currentPoll);
+  socket.on("spinStart", (data) => {
+    if (!isValidKey(data.key)) return;
+    wheelAccepting = false;
+  });
+
+  socket.on("spinEnd", (data) => {
+    if (!isValidKey(data.key)) return;
+
+    const winner = data.winner;
+    wheelBlacklisted.clear();
+    wheelBlacklisted.add(winner);
+    io.emit("wheelRemoveAndPunish", winner);
+
+    wheelPunished.clear();
+    wheelAccepting = true;
+  });
+
+  socket.on("resetWheel", (data) => {
+    if (!isValidKey(data.key)) return;
+
+    wheelEntries = [];
+    wheelPunished.clear();
+    wheelBlacklisted.clear();
+    wheelAccepting = true;
+    io.emit("resetWheel");
+  });
+
+  socket.on("vote", ({ user, option }) => {
+    if (!currentPoll) return;
+    if (!currentPoll.options.includes(option)) return;
+
+    currentPoll.votes[user] = option;
+    io.emit("voteUpdate", currentPoll.votes);
+  });
 });
 
-
-socket.on("togglePollVisibility", (data) => {
-  if (!verifyKey(data?.key)) return;
-  io.emit("togglePollVisibility");
-});
-
-  
-
-socket.on("endPoll", (data) => {
-  if (!verifyKey(data?.key)) return;
-
+function endPoll() {
   clearTimeout(pollTimer);
   pollTimer = null;
   io.emit("pollEnded", currentPoll);
   currentPoll = null;
-});
-
-});
-let wheelEntries = [];
-let wheelPunished = new Set();
-let wheelBlacklisted = new Set();
-let wheelAccepting = true;
-
-client.on("message", (channel, tags, message, self) => {
-  if (self) return;
-
-  const username = tags.username;
-  const msg = message.trim();
-
-  if (!wheelAccepting || wheelBlacklisted.has(username)) return;
-/*if(msg === "pk!testusers") {
-      wheelEntries.push("testuser1");
-      io.emit("wheelAdd", "testuser1");
-      wheelEntries.push("testuser2");
-      io.emit("wheelAdd", "testuser2");
-      wheelEntries.push("testuser3");
-      io.emit("wheelAdd", "testuser3");
-      wheelEntries.push("testuser4");
-      io.emit("wheelAdd", "testuser4");
-      wheelEntries.push("testuser5");
-      io.emit("wheelAdd", "testuser5");
-      wheelEntries.push("testuser6");
-      io.emit("wheelAdd", "testuser6");
-      wheelEntries.push("testuser7");
-      io.emit("wheelAdd", "testuser7");
-      wheelEntries.push("testuser8");
-      io.emit("wheelAdd", "testuser8");
-}*/
-  if (msg === "W" || msg == "w" || msg == "1" || msg == "!play" || msg == "!join") {
-    if (wheelEntries.includes(username)) {
-   /*   // Remove and punish
-      wheelEntries = wheelEntries.filter(n => n !== username);
-      wheelPunished.add(username);
-    //  client.say(channel, `@${username}, you already typed W, moron! You know what, I'm removing you from the wheel. Don't do that again.`);
-      io.emit("wheelRemoveAndPunish", username);*/
-    } else if (!wheelPunished.has(username)) {
-      wheelEntries.push(username);
-      io.emit("wheelAdd", username);
-    }
-  }
-});
-
-io.on("connection", (socket) => {
-  // Send existing entries if needed
-  wheelEntries.forEach(name => socket.emit("wheelAdd", name));
-
-socket.on("spinStart", (data) => {
-  if (!verifyKey(data?.key)) return;
-  wheelAccepting = false;
-});
-
-socket.on("spinEnd", ({ winner, key }) => {
-  if (!verifyKey(key)) return;
-
-  wheelBlacklisted.clear();
-  wheelBlacklisted.add(winner);
-  io.emit("wheelRemoveAndPunish", winner);
-
-  wheelPunished.clear();
-  wheelAccepting = true;
-});
-
-socket.on("resetWheel", (data) => {
-  if (!verifyKey(data?.key)) return;
-
-  wheelEntries = [];
-  wheelPunished.clear();
-  wheelBlacklisted.clear();
-  wheelAccepting = true;
-  io.emit("resetWheel");
-});
-})
-
+}
 
 server.listen(3000, () => {
-  console.log("Server running at http://localhost:3000");
+  console.log("Server running on http://localhost:3000");
 });
 
 // Connect to Twitch chat
