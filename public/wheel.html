@@ -175,12 +175,12 @@ socket.emit("spinStart", { key: securityKey });
             const securityKey = document.getElementById('securityKey').value;
 
 socket.emit("spinEnd", { key: securityKey, winner: winner });
-});
     }
   }
 
   requestAnimationFrame(animate);
 }
+
 
 
 
