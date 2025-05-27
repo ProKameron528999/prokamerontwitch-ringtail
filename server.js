@@ -990,47 +990,63 @@ let wheelBlacklisted = new Set();
 let wheelAccepting = true;
 
 client.on("message", (channel, tags, message, self) => {
-  if (self) return;
+  if (self) return; // Ignore messages from the bot itself
 
-  const username = tags.username;
-  const msg = message.trim();
+  const rawUsername = tags.username;
+  if (!rawUsername) {
+    console.log("Message received with missing username:", tags);
+    return;
+  }
+
+  const username = rawUsername.toLowerCase();
+  const msg = message.trim().toLowerCase();
+
+  // Debug logging
+  console.log(`[${username}]: ${msg}`);
 
   if (!wheelAccepting || wheelBlacklisted.has(username)) return;
-/*if(msg === "pk!testusers") {
-      wheelEntries.push("testuser1");
-      io.emit("wheelAdd", "testuser1");
-      wheelEntries.push("testuser2");
-      io.emit("wheelAdd", "testuser2");
-      wheelEntries.push("testuser3");
-      io.emit("wheelAdd", "testuser3");
-      wheelEntries.push("testuser4");
-      io.emit("wheelAdd", "testuser4");
-      wheelEntries.push("testuser5");
-      io.emit("wheelAdd", "testuser5");
-      wheelEntries.push("testuser6");
-      io.emit("wheelAdd", "testuser6");
-      wheelEntries.push("testuser7");
-      io.emit("wheelAdd", "testuser7");
-      wheelEntries.push("testuser8");
-      io.emit("wheelAdd", "testuser8");
-}*/
-  if (msg === "W" || msg == "w" || msg == "1" || msg == "!play" || msg == "!join") {
+
+  // Test command (optional, uncomment to use)
+  /*
+  if (msg === "pk!testusers") {
+    const testUsers = [
+      "testuser1", "testuser2", "testuser3", "testuser4",
+      "testuser5", "testuser6", "testuser7", "testuser8"
+    ];
+    testUsers.forEach(user => {
+      if (!wheelEntries.includes(user)) {
+        wheelEntries.push(user);
+        io.emit("wheelAdd", user);
+      }
+    });
+    return;
+  }
+  */
+
+  // Join command
+  const joinCommands = ["w", "1", "!play", "!join"];
+  if (joinCommands.includes(msg)) {
     if (wheelEntries.includes(username)) {
-   /*   // Remove and punish
+      /*
+      // Remove and punish
       wheelEntries = wheelEntries.filter(n => n !== username);
       wheelPunished.add(username);
-    //  client.say(channel, `@${username}, you already typed W, moron! You know what, I'm removing you from the wheel. Don't do that again.`);
-      io.emit("wheelRemoveAndPunish", username);*/
+      client.say(channel, `@${username}, you already joined. You're being removed and punished.`);
+      io.emit("wheelRemoveAndPunish", username);
+      */
     } else if (!wheelPunished.has(username)) {
       wheelEntries.push(username);
       io.emit("wheelAdd", username);
+      console.log(`Added ${username} to wheel.`);
     }
   }
 });
+
 function isAuthorizedKey(key) {
   return key === process.env.SECRET;
 }
 io.on("connection", (socket) => {
+
   socket.on("startPoll", (data) => {
     if (!isAuthorizedKey(data.key)) return;
 
@@ -1088,6 +1104,15 @@ io.on("connection", (socket) => {
     pollTimer = null;
     io.emit("pollEnded", currentPoll);
     currentPoll = null;
+  });
+  socket.on("resetWheel", (data) => {
+    if (!isAuthorizedKey(data.key)) return;
+
+    wheelEntries = [];
+    wheelPunished.clear();
+    wheelBlacklisted.clear();
+    wheelAccepting = true;
+    io.emit("resetWheel");
   });
 });
 
