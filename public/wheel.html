@@ -183,6 +183,11 @@ socket.emit("spinEnd", { key: securityKey, winner: winner });
 
 
 
+socket.on("wheelState", (state) => {
+  names = state.entries.filter(n => !state.punished.includes(n));
+  punished = new Set(state.punished);
+  drawWheel();
+});
 
     socket.on("wheelAdd", (name) => {
       if (!names.includes(name) && !punished.has(name)) {

@@ -1046,7 +1046,10 @@ function isAuthorizedKey(key) {
   return key === process.env.SECRET;
 }
 io.on("connection", (socket) => {
-
+  socket.emit("wheelState", {
+    entries: wheelEntries,
+    punished: Array.from(wheelPunished),
+  });
   socket.on("startPoll", (data) => {
     if (!isAuthorizedKey(data.key)) return;
 
