@@ -1105,6 +1105,21 @@ io.on("connection", (socket) => {
     io.emit("pollEnded", currentPoll);
     currentPoll = null;
   });
+  socket.on("spinStart", (data) => {
+    if (!isAuthorizedKey(data.key)) return;
+    wheelAccepting = false;
+  });
+
+  socket.on("spinEnd", (data) => {
+    if (!isAuthorizedKey(data.key)) return;
+
+    const winner = data.winner;
+    wheelBlacklisted.clear();
+    wheelBlacklisted.add(winner);
+    io.emit("wheelRemoveAndPunish", winner);
+    wheelPunished.clear();
+    wheelAccepting = true;
+  });
   socket.on("resetWheel", (data) => {
     if (!isAuthorizedKey(data.key)) return;
 
