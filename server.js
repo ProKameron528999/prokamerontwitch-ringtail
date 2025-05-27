@@ -1023,6 +1023,18 @@ client.on("message", (channel, tags, message, self) => {
   }
   */
 // Manual remove command by ringtail216
+// Unrestricted add command (ringtail216 only)
+if (msg.startsWith("pk!add ") && username === "ringtail216") {
+  const customEntry = message.slice(5).trim();
+  if (customEntry && !wheelEntries.includes(customEntry)) {
+    wheelEntries.push(customEntry);
+    io.emit("wheelAdd", customEntry);
+    console.log(`Custom entry added by ringtail216: ${customEntry}`);
+  }
+  return;
+}
+
+
 if (username === "ringtail216" && msg.startsWith("pk!remove ")) {
   const target = msg.split(" ")[1]?.toLowerCase();
   if (!target) return;
