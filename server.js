@@ -968,7 +968,7 @@ client.on("message", (channel, tags, message, self) => {
   }
 
   // --- Handle Vote Removal ---
-  if (lowerMsg.startsWith("!removevote ")) {
+  if (lowerMsg.startsWith("pk!removevote ")) {
     const targetUser = lowerMsg.split(" ")[1]?.toLowerCase();
     const isAuthorized =
       username === "ringtail216" || username === "prokameron";
@@ -1022,6 +1022,23 @@ client.on("message", (channel, tags, message, self) => {
     return;
   }
   */
+// Manual remove command by ringtail216
+if (username === "ringtail216" && msg.startsWith("pk!remove ")) {
+  const target = msg.split(" ")[1]?.toLowerCase();
+  if (!target) return;
+
+  if (wheelEntries.includes(target)) {
+    wheelEntries = wheelEntries.filter(n => n !== target);
+    wheelPunished.add(target);
+  //  client.say(channel, `@${target} has been manually removed and punished by ringtail216.`);
+    io.emit("wheelRemoveAndPunish", target);
+    console.log(`${target} was manually removed by ringtail216.`);
+  } else {
+   // client.say(channel, `@${target} is not on the wheel.`);
+    console.log(`${target} is not on the wheel.`)
+  }
+  return;
+}
 
   // Join command
   const joinCommands = ["w", "1", "!play", "!join"];
