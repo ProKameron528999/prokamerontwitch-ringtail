@@ -1160,8 +1160,8 @@ io.on("connection", (socket) => {
     wheelBlacklisted.clear();
     wheelAccepting = true;
     io.emit("resetWheel");
-        io.emit("wheelAdd", "Codename: UB_Developer");
-    wheelEntries.push("Codename: UB_Developer");
+        io.emit("wheelAdd", "prokameron");
+    wheelEntries.push("prokameron");
   });
 });
 
