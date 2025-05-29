@@ -17,7 +17,7 @@ characterAI.setup("F0B-9H4f8Gsj3AS9owDhSFrhNAe7w4eo3nAGKfAHzWM", process.env.CHA
 
 
 
-
+ 
 const https = require("https");
 const fetch = require("node-fetch");
 
