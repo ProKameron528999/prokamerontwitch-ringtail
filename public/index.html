@@ -80,11 +80,12 @@
     
 
 <script>
-  function toggleOverlayVisibility() {
-    socket.emit("togglePollVisibility", { key: securityKey });
-   alert("Hidden")
+function toggleOverlayVisibility() {
+  const securityKey = document.getElementById('securityKey').value;
+  socket.emit("togglePollVisibility", { key: securityKey });
+  alert("Toggled poll visibility.");
+}
 
-  }
 </script>
 
 

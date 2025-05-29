@@ -107,20 +107,23 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
   function togglePollVisibility() {
-  const pollContainer = document.getElementById('poll-container');
-  pollContainer.style.display = (pollContainer.style.display === 'none' || pollContainer.style.display === '') ? 'block' : 'none';
-}
+    const pollContainer = document.getElementById('poll-container');
+    pollContainer.style.display = (pollContainer.style.display === 'none' || pollContainer.style.display === '') ? 'block' : 'none';
+  }
 
   const socket = io();
   const pollContainer = document.getElementById('poll-container');
   const questionEl = document.getElementById('question');
   const optionsEl = document.getElementById('options');
   const endedEl = document.getElementById('ended');
+  const timerEl = document.getElementById('timer');
   let currentOptions = [];
   let latestVotes = {};
-socket.on('togglePollVisibility', () => {
-  togglePollVisibility();
-});
+  let pollEndTime = null;
+
+  socket.on('togglePollVisibility', () => {
+    togglePollVisibility();
+  });
 
   socket.on('pollStarted', (poll) => {
     currentOptions = poll.options;
@@ -136,6 +139,13 @@ socket.on('togglePollVisibility', () => {
     `).join('');
     pollContainer.style.display = 'block';
     endedEl.style.display = 'none';
+
+    if (poll.timer > 0) {
+      pollEndTime = Date.now() + poll.timer * 1000;
+      updateTimer();
+    } else {
+      timerEl.textContent = '';
+    }
   });
 
   socket.on('voteUpdate', (votes) => {
@@ -156,11 +166,9 @@ socket.on('togglePollVisibility', () => {
   });
 
   socket.on('pollEnded', () => {
-    // Calculate final vote tally
     const count = {};
     Object.values(latestVotes).forEach(v => count[v] = (count[v] || 0) + 1);
 
-    // Find the option with the most votes
     let maxVotes = 0;
     let winner = null;
     currentOptions.forEach(opt => {
@@ -170,7 +178,6 @@ socket.on('togglePollVisibility', () => {
       }
     });
 
-    // Highlight the winner's bar
     if (winner) {
       const winnerBar = document.getElementById(`bar-${winner}`);
       if (winnerBar) {
@@ -178,39 +185,22 @@ socket.on('togglePollVisibility', () => {
       }
     }
 
-    // Optional: hide "poll ended" message
-    endedEl.style.display = 'none';
+    endedEl.style.display = 'none'; // Or change to 'block' if you want to show the "Poll Ended" message
   });
-  
-  let pollEndTime = null;
 
-socket.on('pollStarted', (poll) => {
-  // Store the end time if a timer is set
-  if (poll.timer > 0) {
-    pollEndTime = Date.now() + poll.timer * 1000;
-    updateTimer();
-  } else {
-    document.getElementById('timer').textContent = '';
-  }
-});
-
-socket.on('pollEnded', () => {
- // document.getElementById('timer').textContent = 'Poll Ended';
-});
-  
   function updateTimer() {
-  if (pollEndTime) {
-    const timeLeft = Math.max(0, pollEndTime - Date.now());
-    const secondsLeft = Math.floor(timeLeft / 1000);
-const minutes = Math.floor(secondsLeft / 60);
-const seconds = secondsLeft % 60;
-document.getElementById('timer').textContent = `Time left: ${minutes}:${seconds.toString().padStart(2, '0')}`;
-    
-    if (timeLeft > 0) {
-      setTimeout(updateTimer, 1000);
+    if (pollEndTime) {
+      const timeLeft = Math.max(0, pollEndTime - Date.now());
+      const secondsLeft = Math.floor(timeLeft / 1000);
+      const minutes = Math.floor(secondsLeft / 60);
+      const seconds = secondsLeft % 60;
+      timerEl.textContent = `Time left: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+      if (timeLeft > 0) {
+        setTimeout(updateTimer, 1000);
+      }
     }
   }
-}
 </script>
 </body>
 </html>
