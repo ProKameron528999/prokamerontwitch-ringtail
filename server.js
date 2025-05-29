@@ -14,7 +14,7 @@ const characterAI = require("./api/index2.js");
 
 characterAI.authenticate(process.env.TOKEN);
 characterAI.setup("F0B-9H4f8Gsj3AS9owDhSFrhNAe7w4eo3nAGKfAHzWM", process.env.CHAT_ID, 482971041, "User");
-
+ 
 
 
  
