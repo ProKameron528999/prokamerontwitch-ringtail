@@ -1,4 +1,5 @@
-//process.exit(); 
+process.exit(); 
+let lastWinner = "Nobody"
 const ran = require("./lib/random");
 // setInterval(() => {
 //    let stupidthing = ran.chooseAngryResponse();
@@ -1064,6 +1065,8 @@ if (username === "ringtail216" && msg.startsWith("pk!remove ")) {
       io.emit("wheelRemoveAndPunish", username);
       */
     } else if (!wheelPunished.has(username)) {
+      if (lastWinner == username) return; // Stops the code from going further. They won't be added.
+      
       wheelEntries.push(username);
       io.emit("wheelAdd", username);
       console.log(`Added ${username} to wheel.`);
@@ -1146,8 +1149,9 @@ io.on("connection", (socket) => {
     if (!isAuthorizedKey(data.key)) return;
 
     const winner = data.winner;
+    lastWinner = data.winner // Log the last winner
     wheelBlacklisted.clear();
-    wheelBlacklisted.add(winner);
+   // wheelBlacklisted.add(winner);
     io.emit("wheelRemoveAndPunish", winner);
     wheelPunished.clear();
     wheelAccepting = true;
