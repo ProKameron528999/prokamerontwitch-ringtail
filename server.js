@@ -1,4 +1,4 @@
-process.exit(); 
+//process.exit(); 
 let lastWinner = "Nobody"
 const ran = require("./lib/random");
 // setInterval(() => {
