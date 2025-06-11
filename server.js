@@ -1167,11 +1167,12 @@ io.on("connection", (socket) => {
   //      io.emit("wheelAdd", "prokameron");
    // wheelEntries.push("prokameron");
   });
-    socket.on("resetWheel", (data) => {
+    socket.on("giveprokameron", (data) => {
     if (!isAuthorizedKey(data.key)) return;
 
-  //      io.emit("wheelAdd", "prokameron");
-   // wheelEntries.push("prokameron");
+        io.emit("wheelAdd", "prokameron");
+    wheelEntries.push("prokameron");
+   //   io.emit("giveprokameron")
   });
 });
 

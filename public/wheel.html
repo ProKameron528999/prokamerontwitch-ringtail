@@ -109,6 +109,10 @@
     <div id="winner"></div>
     <button id="spinBtn">🎯 Spin</button>
     <button id="resetBtn">🔄 Reset</button>
+    <br>
+<button id="giveprokameron">
+  Add Kameron to Wheel<br>(for Kameron only to press)
+    </button>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -224,6 +228,11 @@ socket.on("wheelState", (state) => {
             const securityKey = document.getElementById('securityKey').value;
 
 socket.emit("resetWheel", { key: securityKey });
+    });
+        giveprokameron.addEventListener("click", () => {
+            const securityKey = document.getElementById('securityKey').value;
+
+socket.emit("giveprokameron", { key: securityKey });
     });
 
     // Password verification logic
