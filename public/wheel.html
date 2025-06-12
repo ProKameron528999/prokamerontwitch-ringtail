@@ -11,7 +11,9 @@
       text-align: center;
       padding-top: 30px;
     }
-
+    h1 {
+      color: #ff0000;
+    }
     #wheel-container {
       position: relative;
       width: 400px;
@@ -56,18 +58,13 @@
       color: white;
     }
     button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 18px;
-      border-radius: 10px;
-      border: none;
-      background: #444;
-      color: white;
+      background: #ff0000;
+      color: black;
       cursor: pointer;
     }
 
     button:hover {
-      background: #666;
+      background: #a60000;
     }
 
     /* Security Key Prompt */
@@ -88,15 +85,15 @@
   <div id="securityPrompt">
     <input id="securityKey" type="password" placeholder="Enter security key" /><br>
     <button onclick="verifySecurityKey()">Submit</button>
-<h1>
+<h2>
   Welcome back. Please remember to reset the wheel each time you open the website. 
-    </h1>
-<h1>
+    </h2>
+<h2>
   Also remember the commands, pk!add and pk!remove
-    </h1>
-<h1>
+    </h2>
+<h2>
   (in case you need them)
-    </h1>
+    </h2>
 
   </div>
 
