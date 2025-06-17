@@ -14,12 +14,10 @@
     h1 {
       color: #ff0000;
     }
-    #wheel-container {
-      position: relative;
-      width: 400px;
-      height: 400px;
-      margin: auto;
-    }
+#wheel-container {
+  position: relative;
+  display: inline-block;
+}
 
     canvas {
       background: #222;
@@ -110,6 +108,9 @@
 <button id="giveprokameron">
   Add Kameron to Wheel<br>(for Kameron only to press)
     </button>
+    <br>
+        <button id="increaseSizeBtn">➕ Make Wheel Bigger</button>
+    <button id="decreaseSizeBtn">➖ Make Wheel Smaller</button>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -120,6 +121,12 @@
     const spinBtn = document.getElementById("spinBtn");
     const resetBtn = document.getElementById("resetBtn");
     const winnerDisplay = document.getElementById("winner");
+
+    let wheelSize = 400; // Initial size
+
+
+
+
 
     let names = [];
     let punished = new Set();
@@ -153,7 +160,31 @@
         ctx.restore();
       });
     }
+function updateWheelSize(newSize) {
+  wheelSize = Math.max(200, Math.min(800, newSize)); // Clamp size
+  canvas.width = wheelSize;
+  canvas.height = wheelSize;
+  canvas.style.width = wheelSize + "px";
+  canvas.style.height = wheelSize + "px";
 
+  const arrow = document.getElementById("arrow");
+  arrow.style.top = `-${Math.floor(wheelSize * 0.075)}px`;
+
+  // Optional: resize arrow
+  arrow.style.borderLeftWidth = `${wheelSize * 0.0375}px`;
+  arrow.style.borderRightWidth = `${wheelSize * 0.0375}px`;
+  arrow.style.borderTopWidth = `${wheelSize * 0.075}px`;
+
+  drawWheel();
+}
+
+document.getElementById("increaseSizeBtn").addEventListener("click", () => {
+  updateWheelSize(wheelSize + 50);
+});
+
+document.getElementById("decreaseSizeBtn").addEventListener("click", () => {
+  updateWheelSize(wheelSize - 50);
+});
 function spinWheel() {
   if (names.length === 0 || spinning) return;
   spinning = true;
