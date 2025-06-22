@@ -94,7 +94,21 @@ function toggleOverlayVisibility() {
 }
 
 </script>
+<div id="soundControls" class="hidden">
+<h2>Play a Sound</h2>
+<input id="audioUrl" placeholder="Paste audio URL (e.g., mp3)">
+<br>
+<button onclick="playSound()">Play Sound</button>
 
+<script>
+  function playSound() {
+    const securityKey = document.getElementById("securityKey").value;
+    const audioUrl = document.getElementById("audioUrl").value.trim();
+    if (!audioUrl) return alert("Please enter an audio URL.");
+    socket.emit("playSound", { key: securityKey, url: audioUrl });
+  }
+</script>
+</div>
 
     <div class="embed-info">
       <p>🔗 Open <code>poll.html</code> in OBS as a browser source to show the live poll.</p>

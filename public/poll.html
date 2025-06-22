@@ -124,6 +124,13 @@
   socket.on('togglePollVisibility', () => {
     togglePollVisibility();
   });
+socket.on("playSound", (url) => {
+  const audio = new Audio(url);
+  audio.volume = 1.0; // you can change this to 0.5 or lower if needed
+  audio.play().catch(err => {
+    console.warn("Failed to play audio:", err);
+  });
+});
 
   socket.on('pollStarted', (poll) => {
     currentOptions = poll.options;

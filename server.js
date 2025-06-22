@@ -1082,6 +1082,13 @@ io.on("connection", (socket) => {
     entries: wheelEntries,
     punished: Array.from(wheelPunished),
   });
+  socket.on("playSound", (data) => {
+  if (!isAuthorizedKey(data.key)) return;
+  if (!data.url) return;
+
+  io.emit("playSound", data.url);
+});
+
   socket.on("startPoll", (data) => {
     if (!isAuthorizedKey(data.key)) return;
 
