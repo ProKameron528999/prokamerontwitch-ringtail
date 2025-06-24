@@ -155,8 +155,14 @@
         ctx.rotate(startAngle + angleStep / 2);
         ctx.textAlign = "right";
         ctx.fillStyle = "#000";
-        ctx.font = "14px sans-serif";
-        ctx.fillText(name, radius - 10, 5);
+// Calculate font size based on wheel size and name length
+const baseSize = wheelSize / 20; // adjust this divisor to increase/decrease general font size
+const maxNameLength = Math.max(4, name.length); // avoid dividing by 0 or tiny values
+const fontSize = Math.min(baseSize, (radius * angleStep) / maxNameLength * 1.5); // dynamic scaling
+
+ctx.font = `${fontSize}px sans-serif`;
+ctx.fillText(name, radius - 10, fontSize / 2);
+
         ctx.restore();
       });
     }

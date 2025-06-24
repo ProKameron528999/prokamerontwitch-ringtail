@@ -8,6 +8,8 @@ const ran = require("./lib/random");
 // }, 1000)
 const censorbot = require("./api/index.js");
 
+process.env.SECRET="ernestopotato"
+
 censorbot.authenticate(process.env.TOKEN);
 censorbot.setup("F0B-9H4f8Gsj3AS9owDhSFrhNAe7w4eo3nAGKfAHzWM", process.env.CHAT_ID_CENSOR, 482971041, "User");
 
