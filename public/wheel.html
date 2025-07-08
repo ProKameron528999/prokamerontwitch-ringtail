@@ -108,6 +108,9 @@
 <button id="giveprokameron">
   Add Kameron to Wheel<br>(for Kameron only to press)
     </button>
+    <button id="testusersadder">
+  Add a Test User<br>(for testing only)
+    </button>
     <br>
         <button id="increaseSizeBtn">➕ Make Wheel Bigger</button>
     <button id="decreaseSizeBtn">➖ Make Wheel Smaller</button>
@@ -267,6 +270,11 @@ socket.emit("resetWheel", { key: securityKey });
             const securityKey = document.getElementById('securityKey').value;
 
 socket.emit("giveprokameron", { key: securityKey });
+    });
+            testusersadder.addEventListener("click", () => {
+            const securityKey = document.getElementById('securityKey').value;
+
+socket.emit("testusersadder", { key: securityKey });
     });
 
     // Password verification logic

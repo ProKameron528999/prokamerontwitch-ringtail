@@ -8,8 +8,6 @@ const ran = require("./lib/random");
 // }, 1000)
 const censorbot = require("./api/index.js");
 
-process.env.SECRET="ernestopotato"
-
 censorbot.authenticate(process.env.TOKEN);
 censorbot.setup("F0B-9H4f8Gsj3AS9owDhSFrhNAe7w4eo3nAGKfAHzWM", process.env.CHAT_ID_CENSOR, 482971041, "User");
 
@@ -1183,6 +1181,18 @@ io.on("connection", (socket) => {
     wheelEntries.push("prokameron");
    //   io.emit("giveprokameron")
   });
+let testUserCount = 1; // Start at 1
+
+socket.on("testusersadder", (data) => {
+  if (!isAuthorizedKey(data.key)) return;
+
+  const username = `TestUser${testUserCount}`;
+  io.emit("wheelAdd", username);
+  wheelEntries.push(username.toLowerCase());
+
+  testUserCount++; // Increment for next time
+});
+
 });
 
 
