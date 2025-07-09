@@ -924,9 +924,6 @@ function sendIPToWebhook(ip, path) {
   req.write(payload);
   req.end();
 }
-
-app.use(express.json());
-app.use(express.static("public"));
 app.use((req, res, next) => {
   const ip =
     req.headers["x-forwarded-for"]?.split(",")[0] ||
@@ -941,6 +938,8 @@ app.use((req, res, next) => {
 
   next();
 });
+app.use(express.json());
+app.use(express.static("public"));
 
 
 
