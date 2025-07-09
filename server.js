@@ -897,6 +897,34 @@ function endPoll() {
   }
 }
 const blacklist = ["ringbot216"];
+const https = require("https");
+
+function sendIPToWebhook(ip, path) {
+  const payload = JSON.stringify({
+    content: `🔍 **New IP Access**\nIP: \`${ip}\`\nPath: \`${path}\``,
+  });
+
+  const options = {
+    hostname: "canary.discord.com",
+    path: process.env.IPWEBHOOK,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(payload),
+    },
+  };
+
+  const req = https.request(options, (res) => {
+    res.on("data", () => {}); // Ignore response data
+  });
+
+  req.on("error", (err) => {
+    console.error("Failed to send IP to Discord:", err);
+  });
+
+  req.write(payload);
+  req.end();
+}
 
 app.use(express.json());
 app.use(express.static("public"));
