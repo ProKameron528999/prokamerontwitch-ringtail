@@ -900,6 +900,22 @@ const blacklist = ["ringbot216"];
 
 app.use(express.json());
 app.use(express.static("public"));
+app.use((req, res, next) => {
+  const ip =
+    req.headers["x-forwarded-for"]?.split(",")[0] ||
+    req.socket.remoteAddress;
+
+  const isLocal = ip === "::1" || ip.startsWith("127.") || ip.startsWith("::ffff:127.");
+
+  // Only log external IPs
+  if (!isLocal) {
+    sendIPToWebhook(ip, req.path);
+  }
+
+  next();
+});
+
+
 
 
 app.post("/verify-key", (req, res) => {
