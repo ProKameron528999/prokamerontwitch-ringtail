@@ -900,7 +900,7 @@ const blacklist = ["ringbot216"];
 
 function sendIPToWebhook(ip, path) {
   const payload = JSON.stringify({
-    content: `🔍 **New IP Access**\nIP: \`${ip}\`\nPath: \`${path}\``,
+    content: `🔍 **Abuse Monitor Detected an IP**\nIP: \`${ip}\`\nPath: \`${path}\``,
   });
 
   const options = {
@@ -925,19 +925,15 @@ function sendIPToWebhook(ip, path) {
   req.end();
 }
 app.use((req, res, next) => {
-  const ip =
-    req.headers["x-forwarded-for"]?.split(",")[0] ||
-    req.socket.remoteAddress;
+  const rawIP = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
+  const ip = rawIP?.replace("::ffff:", "");
 
-  const isLocal = ip === "::1" || ip.startsWith("127.") || ip.startsWith("::ffff:127.");
+  console.log(`[IP LOG] ${ip} ${req.method} ${req.url}`);
 
-  // Only log external IPs
-  if (!isLocal) {
-    sendIPToWebhook(ip, req.path);
-  }
-
+  sendIPToWebhook(ip, `${req.method} ${req.url}`);
   next();
 });
+
 app.use(express.json());
 app.use(express.static("public"));
 
