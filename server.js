@@ -897,7 +897,6 @@ function endPoll() {
   }
 }
 const blacklist = ["ringbot216"];
-const https = require("https");
 
 function sendIPToWebhook(ip, path) {
   const payload = JSON.stringify({
